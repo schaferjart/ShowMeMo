@@ -1,9 +1,9 @@
 {
-  "name": "distractor-moma",
+  "name": "distractor-cleveland",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "A single-serving site showing one random artwork from MoMA's collection.",
+  "description": "A single-serving site showing one random artwork from the Cleveland Museum of Art.",
   "scripts": {
     "build": "node build.mjs"
   },
