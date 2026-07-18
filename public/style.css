@@ -75,43 +75,96 @@ main {
   display: block;
   width: 20px;
   height: 20px;
-  transition: transform 0.2s ease;
-}
-
-.controls button[aria-expanded="true"] svg {
-  transform: rotate(45deg);
 }
 
 #caption {
   position: fixed;
   left: 16px;
-  bottom: 44px;
-  max-width: min(42ch, calc(100vw - 32px));
-  padding: 14px 16px;
-  background: var(--panel);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  bottom: 32px;
+  max-width: min(48ch, calc(100vw - 32px));
   font-size: 13px;
 }
 
-#caption p {
-  margin: 0 0 4px;
+#caption.open {
+  padding: 12px 14px;
+  background: var(--panel);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
-#caption p:last-child {
-  margin-bottom: 0;
+#cap-summary {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-#caption p:empty {
-  display: none;
+#cap-summary:hover,
+#cap-summary:focus-visible,
+#caption.open #cap-summary {
+  opacity: 1;
+}
+
+#caption.open #cap-summary {
+  white-space: normal;
+  cursor: default;
 }
 
 #cap-title {
   font-style: italic;
 }
 
-#caption a {
+#cap-details {
+  margin-top: 6px;
+}
+
+#cap-details p {
+  margin: 0 0 4px;
+}
+
+#cap-details p:last-child {
+  margin-bottom: 0;
+}
+
+#cap-details p:empty {
+  display: none;
+}
+
+#cap-details a {
   color: inherit;
+}
+
+.cap-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#cap-close {
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+#cap-close:hover,
+#cap-close:focus-visible {
+  opacity: 1;
 }
 
 footer {

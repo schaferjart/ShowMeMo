@@ -7,7 +7,10 @@ full screen, with almost no interface.
 
 - The artwork fills the viewport.
 - The refresh button (or `Space` / `R`) loads another random work.
-- The plus button (or `I`) toggles the caption.
+- The download button saves the image.
+- Title, artist, and year are always visible at the bottom; clicking them
+  reveals medium, credit line, and a link to the work at MoMA
+  (the `×`, `Esc`, or `I` closes it again).
 - `?id=<ObjectID>` permalinks to a specific work; the URL always reflects the
   work on screen.
 - `?onview=1` restricts the random picks to works currently on view at MoMA.

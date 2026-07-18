@@ -3,11 +3,13 @@
 
   const img = document.getElementById('artwork');
   const refreshBtn = document.getElementById('refresh');
-  const captionBtn = document.getElementById('toggle-caption');
+  const downloadBtn = document.getElementById('download');
   const caption = document.getElementById('caption');
+  const capSummary = document.getElementById('cap-summary');
+  const capDetails = document.getElementById('cap-details');
+  const capClose = document.getElementById('cap-close');
   const capTitle = document.getElementById('cap-title');
-  const capArtist = document.getElementById('cap-artist');
-  const capDate = document.getElementById('cap-date');
+  const capMeta = document.getElementById('cap-meta');
   const capMedium = document.getElementById('cap-medium');
   const capCredit = document.getElementById('cap-credit');
   const capLink = document.getElementById('cap-link');
@@ -50,17 +52,20 @@
     throw new Error('No works found');
   }
 
+  let current = null;
+
   function show(record) {
+    current = record;
     img.classList.remove('loaded');
     img.alt = [record.Title, record.Artist].filter(Boolean).join(' — ');
     img.src = record.ImageURL;
 
-    capTitle.textContent = record.Title;
-    capArtist.textContent = record.Artist;
-    capDate.textContent = record.Date;
+    capTitle.textContent = record.Title || 'Untitled';
+    const meta = [record.Artist, record.Date].filter(Boolean).join(', ');
+    capMeta.textContent = meta ? ', ' + meta : '';
     capMedium.textContent = record.Medium;
     capCredit.textContent = record.CreditLine;
-    capLink.parentElement.hidden = !record.URL;
+    capLink.hidden = !record.URL;
     if (record.URL) capLink.href = record.URL;
 
     const url = new URL(location);
@@ -94,13 +99,38 @@
     next();
   });
 
-  function toggleCaption() {
-    caption.hidden = !caption.hidden;
-    captionBtn.setAttribute('aria-expanded', String(!caption.hidden));
+  function setDetailsOpen(open) {
+    capDetails.hidden = !open;
+    caption.classList.toggle('open', open);
+    capSummary.setAttribute('aria-expanded', String(open));
+  }
+
+  let downloading = false;
+  async function downloadImage() {
+    if (!current || downloading) return;
+    downloading = true;
+    try {
+      const res = await fetch(current.ImageURL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blobURL = URL.createObjectURL(await res.blob());
+      const a = document.createElement('a');
+      a.href = blobURL;
+      a.download = `moma-${current.ObjectID}.jpg`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(blobURL), 10000);
+    } catch {
+      open(current.ImageURL, '_blank', 'noopener');
+    } finally {
+      downloading = false;
+    }
   }
 
   refreshBtn.addEventListener('click', next);
-  captionBtn.addEventListener('click', toggleCaption);
+  downloadBtn.addEventListener('click', downloadImage);
+  capSummary.addEventListener('click', () => {
+    if (capDetails.hidden) setDetailsOpen(true);
+  });
+  capClose.addEventListener('click', () => setDetailsOpen(false));
 
   addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -109,7 +139,9 @@
       e.preventDefault();
       next();
     } else if (key === 'i') {
-      toggleCaption();
+      setDetailsOpen(capDetails.hidden);
+    } else if (key === 'escape') {
+      setDetailsOpen(false);
     }
   });
 
