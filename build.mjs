@@ -1,55 +1,74 @@
-// Downloads MoMA's Artworks.csv, filters to works with images, and shards the
-// records into small JSON files under public/data/.
+// Builds public/data/ from the Minneapolis Institute of Art's collection
+// repo (https://github.com/artsmia/collection): shallow-clones it (one JSON
+// file per object, committed daily), keeps unrestricted public-domain works
+// with a valid image, and shards the records into small JSON files.
+//
+// Images are served from the museum's image API at its 800px "large" size.
 //
 // Sharding is by `ObjectID % shardCount`, so a permalink lookup needs only
 // meta.json plus a single shard — no index file.
+//
+// Set MIA_DIR to an existing clone to skip the ~900 MB clone.
 
-import { parse } from 'csv-parse';
-import { Readable } from 'node:stream';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// The CSV lives in Git LFS; the plain raw.githubusercontent.com URL returns
-// only an LFS pointer file, so fetch the media URL instead.
-const CSV_URL =
-  'https://media.githubusercontent.com/media/MuseumofModernArt/collection/main/Artworks.csv';
-
+const REPO = 'https://github.com/artsmia/collection';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
 const TARGET_SHARD_BYTES = 40_000; // headroom under the ~50 KB ceiling
 
-console.error(`Downloading ${CSV_URL} ...`);
-const res = await fetch(CSV_URL);
-if (!res.ok) {
-  throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
+let repoDir = process.env.MIA_DIR;
+let scratch = null;
+if (!repoDir) {
+  scratch = await mkdtemp(join(tmpdir(), 'mia-'));
+  repoDir = join(scratch, 'collection');
+  console.error(`Cloning ${REPO} (shallow) ...`);
+  execFileSync('git', ['clone', '--quiet', '--depth', '1', REPO, repoDir]);
 }
 
-// Stream straight into the CSV parser. The file starts with a UTF-8 BOM and
-// fields contain quoted commas and escaped quotes; csv-parse handles all that.
-const parser = Readable.fromWeb(res.body).pipe(
-  parse({ bom: true, columns: true, relax_column_count: true })
-);
-
+const objectsDir = join(repoDir, 'objects');
 const works = [];
 let total = 0;
-for await (const row of parser) {
-  total++;
-  const imageURL = (row.ImageURL ?? '').trim();
-  if (!imageURL) continue;
-  const objectID = Number(row.ObjectID);
-  if (!Number.isInteger(objectID) || objectID < 0) continue;
-  const record = {
-    ObjectID: objectID,
-    Title: (row.Title ?? '').trim(),
-    Artist: (row.Artist ?? '').trim(),
-    Date: (row.Date ?? '').trim(),
-    Medium: (row.Medium ?? '').trim(),
-    CreditLine: (row.CreditLine ?? '').trim(),
-    URL: (row.URL ?? '').trim(),
-    ImageURL: imageURL,
-  };
-  if ((row.OnView ?? '').trim()) record.OnView = 1;
-  works.push(record);
+for (const bucket of await readdir(objectsDir)) {
+  let files;
+  try {
+    files = await readdir(join(objectsDir, bucket));
+  } catch {
+    continue;
+  }
+  for (const file of files) {
+    if (!file.endsWith('.json')) continue;
+    total++;
+    let row;
+    try {
+      row = JSON.parse(await readFile(join(objectsDir, bucket, file), 'utf8'));
+    } catch {
+      continue;
+    }
+    if (row.image !== 'valid' || Number(row.restricted) === 1) continue;
+    if ((row.rights_type ?? '') !== 'Public Domain') continue;
+    const objectID = Number(row.id);
+    if (!Number.isInteger(objectID) || objectID < 0) continue;
+    const artist = [row.artist, row.life_date].filter(Boolean).join(', ');
+    const record = {
+      ObjectID: objectID,
+      Title: (row.title ?? '').trim(),
+      Artist: artist.trim(),
+      Date: (row.dated ?? '').trim(),
+      Medium: (row.medium ?? '').trim(),
+      CreditLine: (row.creditline ?? '').trim(),
+      URL: `https://collections.artsmia.org/art/${objectID}`,
+      ImageURL: `https://api.artsmia.org/images/${objectID}/large.jpg`,
+    };
+    if (row.room && row.room !== 'Not on View') record.OnView = 1;
+    works.push(record);
+  }
 }
+
+if (scratch) await rm(scratch, { recursive: true, force: true });
 
 const totalBytes = works.reduce((sum, w) => sum + JSON.stringify(w).length + 1, 0);
 const shardCount = Math.max(1, Math.ceil(totalBytes / TARGET_SHARD_BYTES));
@@ -74,6 +93,6 @@ await writeFile(`${OUT_DIR}meta.json`, JSON.stringify(meta));
 
 const largest = Math.max(...shards.map((s) => JSON.stringify(s).length));
 console.error(
-  `Parsed ${total} records; wrote ${shardCount} shards (largest ${(largest / 1024).toFixed(1)} KB).`
+  `Parsed ${total} objects; wrote ${shardCount} shards (largest ${(largest / 1024).toFixed(1)} KB).`
 );
-console.log(`${works.length} works with images.`);
+console.log(`${works.length} public-domain works with images.`);
