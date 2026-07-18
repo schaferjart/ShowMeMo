@@ -3,6 +3,17 @@
 Research into open datasets that could power sibling sites to Distractor: MoMA,
 verified July 2026.
 
+> **Now on view** — five of these datasets are no longer hypothetical; working
+> Distractors are deployed from their own branches:
+> [Cleveland](https://schaferjart.github.io/ShowMeMo/cleveland/) (`distractor/cleveland`) ·
+> [Chicago](https://schaferjart.github.io/ShowMeMo/artic/) (`distractor/artic`) ·
+> [Washington](https://schaferjart.github.io/ShowMeMo/nga/) (`distractor/nga`) ·
+> [Minneapolis](https://schaferjart.github.io/ShowMeMo/mia/) (`distractor/mia`) ·
+> [Smithsonian 3D](https://schaferjart.github.io/ShowMeMo/3d/) (`distractor/si3d`).
+> The blocked-from-this-environment candidates (SMK, NASA, Wellcome, Paris
+> Musées) remain buildable elsewhere — their sources are open, only this
+> sandbox's egress couldn't reach them.
+
 > Prefer to wander? The same research hangs as an exhibition in
 > [`research.html`](research.html) — *The Museum of Possible Museums* — every
 > dataset as a wall label, sorted into rooms, with a Space/R shuffle like the
