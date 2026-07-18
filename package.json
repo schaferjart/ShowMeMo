@@ -1,0 +1,16 @@
+{
+  "name": "distractor-moma",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A single-serving site showing one random artwork from MoMA's collection.",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "csv-parse": "^5.6.0"
+  }
+}
