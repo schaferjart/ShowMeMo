@@ -47,7 +47,7 @@ Everything below is sorted by how well it meets those three.
 - **The Met** — 470k+ records, [`MetObjects.csv` on GitHub](https://github.com/metmuseum/openaccess) (Git LFS), CC0, `Is Public Domain` flag. Catch: **image URLs are not in the CSV**; each must be fetched from the free keyless API (`collectionapi.metmuseum.org/.../objects/{id}` → `primaryImage`). Feasible as a one-time enrichment crawl whose output gets committed, but it's hundreds of thousands of calls.
 - **Rijksmuseum** — full collection via [data.rijksmuseum.nl](https://data.rijksmuseum.nl/) data dumps + **keyless IIIF images**; CC0/PD "wherever possible." Best non-US art option, but linked-data formats mean more build plumbing than a CSV, and OAI-PMH harvesting still needs a free key.
 - **Victoria & Albert Museum** — keyless API v2 with CSV export and IIIF images (`framemark.vam.ac.uk`), but no bulk dump (page the API) and **not CC0** — V&A terms, non-commercial with attribution.
-- **Smithsonian Open Access** — ~5M CC0 records with media across 19 museums. The **GitHub repo was archived May 2026**; use the S3 bulk data instead ([registry.opendata.aws/smithsonian-open-access](https://registry.opendata.aws/smithsonian-open-access/)). Huge but heterogeneous — heavy filtering needed to isolate artworks with images.
+- **Smithsonian Open Access** — ~5M CC0 records with media across 19 museums. The **GitHub repo was archived May 2026**; use the S3 bulk data instead ([registry.opendata.aws/smithsonian-open-access](https://registry.opendata.aws/smithsonian-open-access/)). Huge but heterogeneous — heavy filtering needed to isolate artworks with images. **The same bucket also holds the open-access 3D models — see the 3D section below.**
 - **Biodiversity Heritage Library** — 300k+ pre-1923 natural-history illustrations, mostly PD. Bulk metadata + page images on [AWS Open Data](https://registry.opendata.aws/bhl-open-data/); page images at `biodiversitylibrary.org/pageimage/{pageID}`. Caveat: metadata is page/book-level, so surfacing *good illustration pages* takes curation (their ~320k-image Flickr set is the pre-curated shortcut, but Flickr harvesting needs a key).
 - **NYPL Digital Collections** — the [NYPL-publicdomain GitHub dump](https://github.com/NYPL-publicdomain/data-and-utilities) has ~190k CC0 items as flat CSV/JSON with `images.nypl.org` URLs, no key — but it's a frozen 2016 snapshot; the live API needs a (free) token.
 - **RCE Beeldbank (Netherlands)** — ~750k–1M photos of Dutch monuments, CC-BY-SA 4.0, keyless OAI-PMH harvest ([opendata.picturae.com](https://opendata.picturae.com/dataset/rce_oai_webservice)). Best European architecture source; XML harvesting is extra tooling.
@@ -67,6 +67,91 @@ Everything below is sorted by how well it meets those three.
 - **Historic England Archive** — listing *data* is open, but the photographs are a paid licensing service.
 - **Cover Art Archive / ArchDaily / editorial sites** — in-copyright imagery.
 
+## 3D objects — Distractor in three dimensions
+
+Extending the idea from a random *image* to a random *3D object* is viable, and
+one source stands far above the rest.
+
+### Smithsonian Open Access 3D — the clear winner (live-verified)
+
+The Smithsonian's 3D digitization program mirrors its open-access models into a
+**public, anonymously listable, CORS-enabled S3 bucket** — which means the
+whole MoMA pattern transfers almost unchanged:
+
+- **Enumerate at build time, no key:**
+  `https://smithsonian-open-access.s3.us-west-2.amazonaws.com/?list-type=2&delimiter=/&prefix=3d/&max-keys=1000`
+  (follow `NextContinuationToken`). Currently **~2,360 3D packages** under
+  `3d/<uuid>/`.
+- **Per package:** multiple GLB levels of detail (`-1024-low.glb` ≈ 1.1 MB,
+  `-2048-medium.glb` ≈ 1.9 MB, `-4096-high.glb` larger; Draco-compressed),
+  plus OBJ/PLY/FBX, poster thumbnails (`scene-image-thumb/low/...jpg`), and a
+  `scene.svx.json` carrying title and `edanRecordId` for captions.
+- **Hotlinkable in the browser:** GLBs return
+  `Access-Control-Allow-Origin: *`, so Google's `<model-viewer>` web component
+  (one ESM file, orbit controls, on-the-fly USDZ for iOS AR) loads them
+  cross-origin from a purely static page — no server, no proxy.
+- **License:** the open-access set is CC0. Caveat for the crawler: confirm
+  per-record CC0 status via the EDAN record (free api.data.gov key, build time
+  only) so frozen shards contain only confirmed-CC0 objects.
+- **Bandwidth:** ~1–2 MB per object at low/medium LOD — roughly 10× a JPEG but
+  fine for one object per pageview; show the poster JPEG first and use the
+  `-low` GLB.
+
+Build shape: crawl the bucket once → record `{uuid, glb_url, poster_url,
+title, edanRecordId}` per package → shard to static JSON → client random-picks
+→ `<model-viewer>`. (The 2D Smithsonian open-access metadata lives in the same
+bucket under `metadata/edan/` — see Tier 2 above.)
+
+### Other 3D sources, briefly
+
+- **Three D Scans (threedscans.com, Oliver Laric)** — ~150+ superb museum
+  sculpture scans, explicitly no copyright restrictions. But STL/OBJ only (no
+  GLB) and no API — you'd convert and self-host. Nice curated supplement.
+- **Sketchfab museum accounts** — avoid for a durable build: Epic is folding
+  Sketchfab into Fab, CC0/CC-BY-SA/NC/ND licenses don't exist on Fab, affected
+  models lose their downloads, and the download API's future is explicitly
+  temporary. Use the Smithsonian's own bucket rather than SI-on-Sketchfab.
+- **Scan the World (MyMiniFactory)** — 2,000+ CC/CC0 community scans, but
+  auth-gated STL downloads and uneven quality. Marginal.
+- **MorphoSource** — ~13k open-access biological specimens (fossils, bones,
+  CT); real REST API but gated downloads and a narrow aesthetic. Niche.
+- **British Museum on Sketchfab / Zamani Project** — skip: NC licensing +
+  Sketchfab wind-down; Zamani is request-only access.
+
+## ETH Zürich collections
+
+ETH-Bibliothek has a genuine open-data program; the catch is plumbing, not
+licensing.
+
+- **E-Pics Bildarchiv** (`ba.e-pics.ethz.ch`) — crossed **1 million digitized
+  images** in Nov 2024: Swissair aerial photography, Comet Photo press archive,
+  Luftbild Schweiz, science/ETH history, portraits. Open data since 2015:
+  Public Domain Mark or CC BY-SA 4.0, ~93% freely downloadable at highest
+  resolution. **Weak point:** no public OAI-PMH/IIIF for E-Pics itself — bulk
+  metadata needs the ETH Library Developer Portal Discovery API (free
+  registration key), and the Canto-CDN image URLs are only medium-stability.
+- **The practical route: Wikimedia Commons mirror** —
+  [Category:Media contributed by the ETH-Bibliothek](https://commons.wikimedia.org/wiki/Category:Media_contributed_by_the_ETH-Bibliothek),
+  ~60k files directly (134k+ targeted in the upload cooperation), PD and
+  CC BY-SA only, machine-readable license per file, keyless bulk API, and the
+  same hotlink-friendly `upload.wikimedia.org`/`Special:FilePath` URLs as any
+  Commons source. **One category harvest gives a ready shard set.**
+- **e-rara.ch** — 100k+ digitized rare prints/maps/books (15th–19th c.,
+  ETH-Bibliothek operated). Keyless **OAI-PMH** (`e-rara.ch/oai`) + full
+  **IIIF** image API; public domain. Excellent fit — caveat is that records
+  are book *pages*, so mine it for plates, maps, and title pages.
+- **e-manuscripta.ch** — same stack (OAI-PMH + IIIF), mostly public-domain
+  manuscripts/drawings/maps; good but visually niche.
+- **Graphische Sammlung ETH** — ~160k prints and drawings, ~61k records online,
+  but the eMuseumPlus catalogue has no API/IIIF/dump. Skip for now; some works
+  surface via the Commons category above.
+- **Thomas-Mann-Archiv** — 2,000+ copyright-free photographs on the E-Pics
+  stack, and Mann's works entered the public domain on 1 Jan 2026 with the
+  archive publishing openly since — a charming niche add-on.
+- **Not usable:** ETH Research Collection (publications, not imagery) and ETH
+  computer-vision datasets like ScanNet (signed non-commercial research
+  agreements only).
+
 ## Recommendations
 
 Ranked by effort-to-payoff for a sibling Distractor:
@@ -77,6 +162,8 @@ Ranked by effort-to-payoff for a sibling Distractor:
 4. **LoC HABS/HAER** *(architecture)* — keyless JSON API, public domain, rich captions; needs polite throttled harvesting at build time.
 5. **NASA Images** or **Wellcome** — keyless APIs with hotlinkable images for space and medical/scientific illustration flavors.
 6. **Wikidata → Commons** — the general-purpose engine if a future Distractor needs any theme (bridges, brutalism, lighthouses…) with structured captions.
+7. **Smithsonian 3D via S3 + `<model-viewer>`** *(3D)* — ~2,360 CC0 packages, keyless enumeration, CORS-enabled hotlinkable GLBs; the only 3D source that fits the static pattern cleanly.
+8. **ETH via Wikimedia Commons or e-rara** *(ETH)* — the two ETH routes that are open, keyless, and bulk-harvestable today.
 
 A note on verification: dataset locations and rate limits above were verified
 against official docs and repos in July 2026, but a smoke test of the top
