@@ -152,6 +152,51 @@ licensing.
   computer-vision datasets like ScanNet (signed non-commercial research
   agreements only).
 
+## Europe — museum by museum
+
+A dedicated sweep of European institutions (verified July 2026). The pattern
+that emerges: the famous flagship museums (Louvre, Prado, Uffizi, British
+Museum, Vatican Museums, KHM Wien) are mostly *closed* — no bulk data, no open
+images — while national galleries and city museums in Denmark, Paris, Frankfurt,
+Berlin, and Vienna are genuinely open. For the closed flagships, Wikimedia
+Commons is the de-facto open channel for their public-domain works.
+
+### The European stars
+
+| Dataset | Content | Data access | Images | License |
+|---|---|---|---|---|
+| **SMK — Statens Museum for Kunst (Denmark)** | 88k+ works, ~40k with images — Denmark's national gallery | Keyless JSON API: `https://api.smk.dk/api/v1/art/search/?keys=*&rows=1000` + offset paging (full crawl ≈ 90 requests); filters like `[has_image:true],[public_domain:true]` | `image_native` direct JPEG per record **plus** IIIF — hotlinkable | **CC0** for reproductions of PD works; per-record `public_domain` flag. **Best in Europe — MoMA-grade ergonomics.** |
+| **Paris Musées Open Content** | ~150k HD reproductions across the 14 City of Paris museums (Carnavalet, Petit Palais, Musée d'Art Moderne…) | GraphQL API at `apicollections.parismusees.paris.fr`; token is **free and self-service** (create account → generate token); the API is the bulk channel | Direct URLs, several sizes + HD, hotlinkable | **CC0** for PD works. Anchor dataset for France. |
+| **Städel Museum (Frankfurt)** | 22k+ public-domain works with downloadable images | Keyless **OAI-PMH**: `https://sammlung.staedelmuseum.de/api/oai` (Dublin Core or LIDO) — fully harvestable | Direct CDN URLs referenced in records | Metadata **CC0**; images of PD works CC BY-SA 4.0 (credit "Städel Museum"). Cleanest German single-museum source. |
+| **Staatliche Museen zu Berlin** | ~270k records across 19 collections | Keyless JSON: `https://api.smb.museum/search/` (+ GraphQL); public-but-undocumented — pin queries | Deterministic hotlinks: `https://recherche.smb.museum/images/{asset_id}_4000x4000.jpg` | CC BY-SA 4.0 / PDM subset, per-record license field. |
+| **Wien Museum** | 134k records / 210k images of Vienna city history and art | The catch: MuseumPlus-backed site with an *undocumented* JSON backend — probe it or harvest via their Wikimedia Commons uploads; a CSV dataset has appeared on data.gv.at | High-res CC0 downloads for PD works | **CC0 including commercial use** — the best-licensed Austrian source; perfect licenses, weakest pipe of this table. |
+| **Biblioteca Digital Hispánica (BNE, Spain)** | 200k+ digitized PD items — books, drawings, engravings, maps, photos | Keyless: BNElab bulk datasets (`bnelab.bne.es`), IIIF, SPARQL at datos.bne.es | IIIF, hotlinkable | Images of PD works **CC BY 4.0** (credit BNE), commercial included. |
+| **BnF Gallica (France)** | ~10M digitized documents, mostly PD | Keyless IIIF + SRU search + OAI-PMH — best-in-class infrastructure | IIIF hotlinking, any size | PD works, but BnF terms: free **non-commercial** reuse with credit; commercial use of the scans is fee-licensed. |
+| **Science Museum Group (UK)** | 500k+ objects of science/industry/design | Keyless JSON:API **plus prebuilt CSV exports of records with CC images** at `coimages.sciencemuseumgroup.org.uk/datasets/` — the MoMA workflow ready-made | Hotlinkable | Metadata CC0/CC-BY; images **CC BY-NC-SA** (flag non-commercial). |
+| **Finna.fi (Finland)** | Millions of records from Finnish museums/archives | Keyless REST API (`api.finna.fi/v1/search`), CORS open, CC0 metadata; filter the usage-rights facet to free-use + has-image | Service-style URLs, hotlinkable | Per-record; CC0/PD subset filterable. |
+| **Museo Egizio (Turin)** | ~3k objects + ~5.5k images — Italy's one true open-access museum | Via its Wikimedia Commons category / Wikidata (formal cooperation) — keyless bulk API | `upload.wikimedia.org`, hotlink-friendly | **CC0**. |
+
+### Usable with caveats
+
+- **DigitaltMuseum / KulturIT (Norway + Sweden)** — 4M+ objects from hundreds of museums, clean hotlink pattern `https://dms01.dimu.org/image/{id}?dimension=max`; needs a free API key from KulturIT and per-item license filtering. Also currently the *only* route to **Nasjonalmuseet Norway** (its own API v1 was retired January 2025; metadata CC0, photos CC BY 4.0).
+- **Nationalmuseum Sweden** — ~3k hand-picked PD paintings on Wikimedia Commons with a companion TSV on GitHub: a zero-risk static bonus. Full-collection access runs through the K-samsök aggregator, which is being replaced end of 2026 — don't build a rebuild pipeline on it.
+- **DigiVatLib (Vatican Apostolic Library)** — ~25k+ fully digitized manuscripts with first-class IIIF (`digi.vatlib.it/iiif/MSS_{shelfmark}/manifest.json`); no dump, but shelfmark lists and Biblissima's aggregation are harvestable. **CC BY-NC** — non-commercial only, flag prominently. The closest thing to "the Vatican" that's actually open.
+- **Deutsche Digitale Bibliothek** — ~50M-record German aggregator, free self-service API key, per-record license facet; but images are heterogeneous (small DDB previews vs. provider-hosted originals of varying reliability).
+- **MDZ / Bayerische Staatsbibliothek** — ~3.2M items over keyless IIIF at massive scale, mostly Public Domain Mark; content is books/manuscripts/maps, so best as a supplement (illuminated manuscripts, prints).
+- **Bodleian (Oxford)** — excellent keyless IIIF + JSON data API; images mostly **CC BY-NC**.
+- **Fitzwilliam (Cambridge)** — ~267k objects, keyless paged JSON API, CC0 metadata, direct JPEGs; images are per-record and lean CC BY-NC-ND — displayable verbatim with credit (which is all a Distractor does), but check the rights field.
+- **Museum Data Service (museumdata.uk)** — new UK aggregator (launched Sept 2024, ~3M records from 21 museums, targeting 100M); free API tokens, per-museum licensing, uneven image coverage. Watchlist rather than build target.
+- **British Library** — its own data services are still crippled by the October 2023 ransomware attack (metadata not restored as of 2026); but the **~1.07M public-domain "Mechanical Curator" book illustrations on Flickr Commons** are stable and hotlinkable (Flickr API key needed to harvest).
+- **Natural History Museum London** — best-in-class open data (keyless CKAN API, CC0 data, CC BY images, 5M+ records) — specimens rather than artworks, but a great fit if the concept stretches to natural history.
+- **Belvedere (Vienna)** and **Kunstmuseum Basel** — genuine open-content policies (CC BY-SA / PD images, IIIF behind the viewers) but no documented bulk API; endpoint spelunking or the Wikimedia Commons route required.
+- **POP / Joconde (France)** — 600k+ records of French museum holdings as open CSV on data.gouv.fr, but the *images* are mostly rights-reserved: metadata-only, join to Wikimedia for pictures.
+- **ICCD Catalogo (Italy)** — millions of heritage records via keyless SPARQL (`dati.beniculturali.it/sparql`), metadata CC BY-SA; images CC BY-**NC** and patchy.
+- **Albertina (Vienna)** — ~200k objects online but no API/bulk/IIIF; reach it via Europeana.
+
+### Closed flagships — use Wikimedia Commons instead
+
+No bulk data and/or no open images as of 2026: **Louvre** (per-object JSON exists but no enumeration; images restricted to private/educational use), **Musée d'Orsay**, **Centre Pompidou** (modern art = in-copyright, structurally closed), **Vatican Museums** (browse-only catalogue, no API), **Uffizi** (browse-only, fee-based reproduction regime), **Prado** (commercial image bank), **British Museum** (no API or dump, CC BY-NC-SA, SPARQL endpoint long-unreliable), **National Portrait Gallery London** (no API, restrictive), **KHM Wien** (non-commercial only, no API), **National Gallery London** (CC0 data but CC BY-NC-ND images and a still-unstable API transition). Public-domain works from all of these are abundantly available on **Wikimedia Commons** via third-party photography — the Wikidata→Commons pipeline from Tier 1 is the practical way to build "a random Louvre/Prado painting" site.
+
 ## Recommendations
 
 Ranked by effort-to-payoff for a sibling Distractor:
@@ -164,6 +209,8 @@ Ranked by effort-to-payoff for a sibling Distractor:
 6. **Wikidata → Commons** — the general-purpose engine if a future Distractor needs any theme (bridges, brutalism, lighthouses…) with structured captions.
 7. **Smithsonian 3D via S3 + `<model-viewer>`** *(3D)* — ~2,360 CC0 packages, keyless enumeration, CORS-enabled hotlinkable GLBs; the only 3D source that fits the static pattern cleanly.
 8. **ETH via Wikimedia Commons or e-rara** *(ETH)* — the two ETH routes that are open, keyless, and bulk-harvestable today.
+9. **SMK Denmark** *(Europe)* — the European source that matches Cleveland/AIC friction levels: keyless API, CC0, image URLs in the response; **Paris Musées** and **Städel** follow close behind.
+10. For "a random Louvre/Prado/British Museum painting": those institutions are closed — go through **Wikimedia Commons/Wikidata** instead.
 
 A note on verification: dataset locations and rate limits above were verified
 against official docs and repos in July 2026, but a smoke test of the top
