@@ -37,6 +37,13 @@ const csv = (file) =>
     parse({ bom: true, columns: true, relax_column_count: true })
   );
 
+// art.csv's Creators column holds creator ids; the names live in creators.csv.
+const creatorName = new Map();
+for await (const row of csv('creators.csv')) {
+  const name = `${(row.name ?? '').trim()}${(row.date ?? '').trimEnd()}`.trim();
+  if (row.id && name) creatorName.set(row.id.trim(), name);
+}
+
 // One image per object: the primary if flagged, otherwise the best-ranked.
 const imageByObject = new Map();
 for await (const row of csv('media.csv')) {
@@ -64,7 +71,12 @@ for await (const row of csv('art.csv')) {
   works.push({
     ObjectID: objectID,
     Title: (row.Title ?? '').trim(),
-    Artist: (row.Creators ?? '').trim() || (row.Culture ?? '').trim(),
+    Artist:
+      (row.Creators ?? '')
+        .split('|')
+        .map((id) => creatorName.get(id.trim()))
+        .filter(Boolean)
+        .join('; ') || (row.Culture ?? '').trim(),
     Date: (row.DateText ?? '').trim(),
     Medium: (row.Medium ?? '').trim(),
     CreditLine: (row.CreditLine ?? '').trim() || 'The Walters Art Museum',
