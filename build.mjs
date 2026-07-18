@@ -1,5 +1,10 @@
-// Downloads MoMA's Artworks.csv, filters to works with images, and shards the
-// records into small JSON files under public/data/.
+// Builds public/data/ from the National Gallery of Art's open data
+// (https://github.com/NationalGalleryOfArt/opendata): downloads objects.csv
+// and published_images.csv, joins them on object id, keeps objects whose
+// primary image is flagged open access, and shards the records into small
+// JSON files.
+//
+// Images are served from the gallery's IIIF endpoint, fit inside 800px.
 //
 // Sharding is by `ObjectID % shardCount`, so a permalink lookup needs only
 // meta.json plus a single shard — no index file.
@@ -9,46 +14,51 @@ import { Readable } from 'node:stream';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-// The CSV lives in Git LFS; the plain raw.githubusercontent.com URL returns
-// only an LFS pointer file, so fetch the media URL instead.
-const CSV_URL =
-  'https://media.githubusercontent.com/media/MuseumofModernArt/collection/main/Artworks.csv';
-
+const BASE =
+  'https://raw.githubusercontent.com/NationalGalleryOfArt/opendata/main/data/';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
 const TARGET_SHARD_BYTES = 40_000; // headroom under the ~50 KB ceiling
 
-console.error(`Downloading ${CSV_URL} ...`);
-const res = await fetch(CSV_URL);
-if (!res.ok) {
-  throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
+async function rows(file) {
+  console.error(`Downloading ${BASE}${file} ...`);
+  const res = await fetch(BASE + file);
+  if (!res.ok) {
+    throw new Error(`Download failed: HTTP ${res.status} for ${file}`);
+  }
+  return Readable.fromWeb(res.body).pipe(
+    parse({ bom: true, columns: true, relax_column_count: true })
+  );
 }
 
-// Stream straight into the CSV parser. The file starts with a UTF-8 BOM and
-// fields contain quoted commas and escaped quotes; csv-parse handles all that.
-const parser = Readable.fromWeb(res.body).pipe(
-  parse({ bom: true, columns: true, relax_column_count: true })
-);
+// Primary open-access image per object: objectid -> IIIF base URL.
+const imageByObject = new Map();
+for await (const row of await rows('published_images.csv')) {
+  if (row.viewtype !== 'primary' || row.openaccess !== '1') continue;
+  const objectID = Number(row.depictstmsobjectid);
+  if (!Number.isInteger(objectID)) continue;
+  const iiif = (row.iiifurl ?? '').trim();
+  if (iiif) imageByObject.set(objectID, iiif);
+}
+console.error(`${imageByObject.size} objects with an open primary image.`);
 
 const works = [];
 let total = 0;
-for await (const row of parser) {
+for await (const row of await rows('objects.csv')) {
   total++;
-  const imageURL = (row.ImageURL ?? '').trim();
-  if (!imageURL) continue;
-  const objectID = Number(row.ObjectID);
+  const objectID = Number(row.objectid);
   if (!Number.isInteger(objectID) || objectID < 0) continue;
-  const record = {
+  const iiif = imageByObject.get(objectID);
+  if (!iiif) continue;
+  works.push({
     ObjectID: objectID,
-    Title: (row.Title ?? '').trim(),
-    Artist: (row.Artist ?? '').trim(),
-    Date: (row.Date ?? '').trim(),
-    Medium: (row.Medium ?? '').trim(),
-    CreditLine: (row.CreditLine ?? '').trim(),
-    URL: (row.URL ?? '').trim(),
-    ImageURL: imageURL,
-  };
-  if ((row.OnView ?? '').trim()) record.OnView = 1;
-  works.push(record);
+    Title: (row.title ?? '').trim(),
+    Artist: (row.attribution ?? '').trim(),
+    Date: (row.displaydate ?? '').trim(),
+    Medium: (row.medium ?? '').trim(),
+    CreditLine: (row.creditline ?? '').trim(),
+    URL: `https://www.nga.gov/artworks/${objectID}`,
+    ImageURL: `${iiif}/full/!800,800/0/default.jpg`,
+  });
 }
 
 const totalBytes = works.reduce((sum, w) => sum + JSON.stringify(w).length + 1, 0);
@@ -74,6 +84,6 @@ await writeFile(`${OUT_DIR}meta.json`, JSON.stringify(meta));
 
 const largest = Math.max(...shards.map((s) => JSON.stringify(s).length));
 console.error(
-  `Parsed ${total} records; wrote ${shardCount} shards (largest ${(largest / 1024).toFixed(1)} KB).`
+  `Parsed ${total} objects; wrote ${shardCount} shards (largest ${(largest / 1024).toFixed(1)} KB).`
 );
-console.log(`${works.length} works with images.`);
+console.log(`${works.length} open-access works with images.`);
