@@ -47,6 +47,15 @@ python3 -m http.server 8000 -d public
 
 ## Deploy
 
+### GitHub Pages
+
+`.github/workflows/pages.yml` builds the dataset and deploys `public/` to
+GitHub Pages on every push to `main`. The site is served at
+<https://schaferjart.github.io/ShowMeMo/>. To refresh the dataset, re-run the
+workflow from the Actions tab (`workflow_dispatch`).
+
+### Docker / Coolify
+
 The `Dockerfile` is a two-stage build: a Node stage runs `build.mjs` (so the
 image always ships a fresh dataset), then `nginx:alpine` serves `public/` with
 long cache headers for `/data/` and static assets, and no caching for
