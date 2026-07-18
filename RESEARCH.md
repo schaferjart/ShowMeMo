@@ -3,6 +3,12 @@
 Research into open datasets that could power sibling sites to Distractor: MoMA,
 verified July 2026.
 
+> Prefer to wander? The same research hangs as an exhibition in
+> [`research.html`](research.html) — *The Museum of Possible Museums* — every
+> dataset as a wall label, sorted into rooms, with a Space/R shuffle like the
+> Distractor itself. Open it in any browser; this file remains the catalogue
+> of record with full details and sources.
+
 ## What the current build needs from a dataset
 
 `build.mjs` works because MoMA's dataset has three properties. Any replacement

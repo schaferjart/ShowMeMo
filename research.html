@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Museum of Possible Museums</title>
+</head>
+<body>
+<style>
+  :root {
+    --wall: #e9eae3;
+    --wall-deep: #dfe1d7;
+    --card: #fbfaf6;
+    --ink: #22251f;
+    --ink-soft: #5a5e54;
+    --ink-faint: #8b8f83;
+    --line: #cfd2c5;
+    --accent: #7c2320;
+    --dot-open: #3e6b3a;
+    --dot-cond: #a3720e;
+    --dot-closed: #9c2b23;
+    --lit: #f3ecd8;
+    --lit-ring: #b99a3e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --wall: #1a1c1e;
+      --wall-deep: #141618;
+      --card: #232629;
+      --ink: #e8e6df;
+      --ink-soft: #a7a89e;
+      --ink-faint: #75766d;
+      --line: #383b3e;
+      --accent: #d08a7a;
+      --dot-open: #6fa568;
+      --dot-cond: #cf9f3d;
+      --dot-closed: #c15048;
+      --lit: #2c2a20;
+      --lit-ring: #8f7a35;
+    }
+  }
+  :root[data-theme="dark"] {
+    --wall: #1a1c1e;
+    --wall-deep: #141618;
+    --card: #232629;
+    --ink: #e8e6df;
+    --ink-soft: #a7a89e;
+    --ink-faint: #75766d;
+    --line: #383b3e;
+    --accent: #d08a7a;
+    --dot-open: #6fa568;
+    --dot-cond: #cf9f3d;
+    --dot-closed: #c15048;
+    --lit: #2c2a20;
+    --lit-ring: #8f7a35;
+  }
+  :root[data-theme="light"] {
+    --wall: #e9eae3;
+    --wall-deep: #dfe1d7;
+    --card: #fbfaf6;
+    --ink: #22251f;
+    --ink-soft: #5a5e54;
+    --ink-faint: #8b8f83;
+    --line: #cfd2c5;
+    --accent: #7c2320;
+    --dot-open: #3e6b3a;
+    --dot-cond: #a3720e;
+    --dot-closed: #9c2b23;
+    --lit: #f3ecd8;
+    --lit-ring: #b99a3e;
+  }
+
+  body {
+    background: var(--wall);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .hall { max-width: 76rem; margin: 0 auto; padding: 0 1.5rem 6rem; }
+
+  /* ---------- entrance ---------- */
+  header.entrance {
+    text-align: center;
+    padding: 5.5rem 1rem 3.5rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 3rem;
+  }
+  .eyebrow {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 1.4rem;
+  }
+  h1 {
+    font-size: clamp(2.1rem, 5.5vw, 3.6rem);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    margin: 0 0 1.1rem;
+    text-wrap: balance;
+  }
+  h1 em { font-style: italic; }
+  .entrance p.lede {
+    max-width: 42rem;
+    margin: 0 auto;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    text-wrap: pretty;
+  }
+  .entrance .visit {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-top: 2.2rem;
+  }
+  .entrance .visit kbd {
+    font-family: inherit;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.1em 0.45em;
+    background: var(--card);
+    color: var(--ink-soft);
+  }
+
+  /* ---------- conditions of loan ---------- */
+  .conditions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin: 0 auto 4rem;
+    max-width: 56rem;
+  }
+  .conditions div { background: var(--wall-deep); padding: 1.1rem 1.3rem; }
+  .conditions strong {
+    display: block;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.35rem;
+  }
+  .conditions span { font-size: 0.88rem; color: var(--ink-soft); }
+
+  /* ---------- rooms ---------- */
+  section.room { margin: 0 0 4.5rem; }
+  .room-door { text-align: center; margin-bottom: 2.2rem; }
+  .room-no {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 0.5rem;
+  }
+  .room-door h2 {
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    font-weight: 500;
+    font-style: italic;
+    margin: 0 0 0.55rem;
+    text-wrap: balance;
+  }
+  .room-door p {
+    max-width: 40rem;
+    margin: 0 auto;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    text-wrap: pretty;
+  }
+  .room-door::after {
+    content: "";
+    display: block;
+    width: 3.5rem;
+    height: 1px;
+    background: var(--accent);
+    margin: 1.4rem auto 0;
+  }
+
+  .labels {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+    gap: 1.4rem;
+    align-items: start;
+  }
+
+  /* ---------- wall label ---------- */
+  article.label {
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 1.35rem 1.45rem 1.2rem;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    transition: box-shadow 0.35s ease, background-color 0.35s ease, outline-color 0.35s ease;
+    outline: 2px solid transparent;
+    outline-offset: 3px;
+  }
+  article.label.lit {
+    background: var(--lit);
+    outline-color: var(--lit-ring);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.16);
+  }
+  .dot {
+    position: absolute;
+    top: 1.45rem;
+    right: 1.35rem;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+  }
+  [data-status="open"]   .dot { background: var(--dot-open); }
+  [data-status="cond"]   .dot { background: var(--dot-cond); }
+  [data-status="closed"] .dot { background: var(--dot-closed); }
+
+  .label h3 {
+    font-size: 1.12rem;
+    font-weight: 600;
+    font-style: italic;
+    margin: 0 0 0.15rem;
+    padding-right: 1.4rem;
+    text-wrap: balance;
+  }
+  .label .artist {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 0.85rem;
+  }
+  .label dl { margin: 0; display: grid; gap: 0.45rem; }
+  .label dt {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0;
+  }
+  .label dd { margin: 0.1rem 0 0; font-size: 0.88rem; color: var(--ink); }
+  .label dd code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+    background: var(--wall-deep);
+    padding: 0.05em 0.35em;
+    border-radius: 2px;
+    overflow-wrap: anywhere;
+  }
+  .label .credit {
+    margin-top: 0.9rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .label a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  .label a:hover, .label a:focus-visible { border-bottom-color: var(--accent); }
+  .label a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* vault labels: dimmed, behind glass */
+  .room.vault article.label { opacity: 0.82; background: var(--wall-deep); }
+  .room.vault .label h3 { font-style: normal; }
+
+  /* ---------- shuffle plaque ---------- */
+  .plaque {
+    position: fixed;
+    bottom: 1.4rem;
+    right: 1.4rem;
+    z-index: 10;
+  }
+  .plaque button {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--card);
+    background: var(--accent);
+    border: none;
+    padding: 0.85rem 1.3rem;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  }
+  .plaque button:hover { filter: brightness(1.12); }
+  .plaque button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  footer.colophon {
+    border-top: 1px solid var(--line);
+    margin-top: 4rem;
+    padding-top: 1.6rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+  }
+  footer.colophon a { color: var(--ink-soft); }
+
+  @media (prefers-reduced-motion: reduce) {
+    article.label { transition: none; }
+    html { scroll-behavior: auto !important; }
+  }
+</style>
+
+<div class="hall">
+
+<header class="entrance">
+  <p class="eyebrow">Distractor · Research Wing · July 2026</p>
+  <h1>The Museum of <em>Possible</em> Museums</h1>
+  <p class="lede">An exhibition of open databases, hung as the sites they might one day become.
+  Each label records what a collection is, how its data leaves the building, and on what terms —
+  the three questions <code>build.mjs</code> asks of any dataset before turning it into a Distractor.</p>
+  <p class="visit">Press <kbd>Space</kbd> or <kbd>R</kbd> to be led to a random acquisition-ready exhibit &nbsp;·&nbsp;
+  <span style="color:var(--dot-open)">●</span> open&ensp;<span style="color:var(--dot-cond)">●</span> conditions apply&ensp;<span style="color:var(--dot-closed)">●</span> not for reuse</p>
+</header>
+
+<div class="conditions" role="note" aria-label="Conditions of loan">
+  <div><strong>I · The dump</strong><span>Bulk metadata — a CSV, JSON, or crawlable API — obtainable once, at build time, ideally without a key.</span></div>
+  <div><strong>II · The picture</strong><span>A direct, hotlinkable image URL (or IIIF pattern) that a browser may load from a static page.</span></div>
+  <div><strong>III · The terms</strong><span>An open license — CC0 or public domain preferred; attribution welcome; non-commercial noted on the label.</span></div>
+</div>
+
+<!-- ══════════════ ROOM I ══════════════ -->
+<section class="room">
+  <div class="room-door">
+    <p class="room-no">Room I</p>
+    <h2>The American Wing</h2>
+    <p>Where open access was invented as a bulk download. Four collections here can be rehung with little more than a find-and-replace.</p>
+  </div>
+  <div class="labels">
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Cleveland Museum of Art</h3>
+      <p class="artist">Cleveland, Ohio · est. 1913</p>
+      <dl>
+        <dt>Medium</dt><dd>CSV &amp; JSON on GitHub (Git LFS) — image URLs already inside the dump</dd>
+        <dt>Dimensions</dt><dd>~61,000 records; ~34,000 with images</dd>
+        <dt>Provenance</dt><dd><a href="https://github.com/ClevelandMuseumArt/openaccess">github.com/ClevelandMuseumArt/openaccess</a></dd>
+      </dl>
+      <p class="credit">CC0. The nearest thing to a find-and-replace on the MoMA build — first acquisition recommended.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Art Institute of Chicago</h3>
+      <p class="artist">Chicago, Illinois</p>
+      <dl>
+        <dt>Medium</dt><dd>Monthly JSONL dump on S3; images conjured deterministically from <code>image_id</code> via IIIF at 843px</dd>
+        <dt>Dimensions</dt><dd>~120,000+ artworks</dd>
+        <dt>Provenance</dt><dd><a href="https://github.com/art-institute-of-chicago/api-data">github.com/art-institute-of-chicago/api-data</a></dd>
+      </dl>
+      <p class="credit">CC0-equivalent; filter <code>is_public_domain</code>. Seurat and Hopper, on demand.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>National Gallery of Art</h3>
+      <p class="artist">Washington, D.C.</p>
+      <dl>
+        <dt>Medium</dt><dd>CSVs refreshed ~daily; IIIF URLs join on object ID via <code>published_images.csv</code></dd>
+        <dt>Dimensions</dt><dd>130,000+ objects; ~50,000 open images</dd>
+        <dt>Provenance</dt><dd><a href="https://github.com/NationalGalleryOfArt/opendata">github.com/NationalGalleryOfArt/opendata</a></dd>
+      </dl>
+      <p class="credit">CC0, with Wikidata IDs thrown in. One join step at build time.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Minneapolis Institute of Art</h3>
+      <p class="artist">Minneapolis, Minnesota</p>
+      <dl>
+        <dt>Medium</dt><dd>One JSON per object, committed daily; predictable images at <code>api.artsmia.org/images/{id}/large.jpg</code></dd>
+        <dt>Dimensions</dt><dd>~90,000+ objects</dd>
+        <dt>Provenance</dt><dd><a href="https://github.com/artsmia/collection">github.com/artsmia/collection</a></dd>
+      </dl>
+      <p class="credit">CC0 data; filter <code>restricted: 0</code>. Clone the repo, shard, done.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>The Metropolitan Museum of Art</h3>
+      <p class="artist">New York, New York</p>
+      <dl>
+        <dt>Medium</dt><dd>CC0 CSV on GitHub — but the pictures live behind a per-object API call (<code>primaryImage</code>)</dd>
+        <dt>Dimensions</dt><dd>470,000+ records; ~200,000 public-domain images</dd>
+        <dt>Provenance</dt><dd><a href="https://github.com/metmuseum/openaccess">github.com/metmuseum/openaccess</a></dd>
+      </dl>
+      <p class="credit">CC0. Condition: requires a one-time enrichment crawl of several hundred thousand calls; commit the result.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Smithsonian Open Access</h3>
+      <p class="artist">Washington, D.C. · nineteen museums at once</p>
+      <dl>
+        <dt>Medium</dt><dd>Line-delimited JSON in a public S3 bucket (the GitHub repo was archived May 2026 — do not build on it)</dd>
+        <dt>Dimensions</dt><dd>~5 million CC0 records with media</dd>
+        <dt>Provenance</dt><dd><a href="https://registry.opendata.aws/smithsonian-open-access/">registry.opendata.aws/smithsonian-open-access</a></dd>
+      </dl>
+      <p class="credit">CC0. Condition: heterogeneous — heavy filtering to find the art among the stamps and specimens. See also Room V.</p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════ ROOM II ══════════════ -->
+<section class="room">
+  <div class="room-door">
+    <p class="room-no">Room II</p>
+    <h2>The European Galleries</h2>
+    <p>The flagships kept their doors shut; the national galleries of Denmark and the city museums of Paris, Frankfurt, Berlin and Vienna opened theirs instead.</p>
+  </div>
+  <div class="labels">
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>SMK — Statens Museum for Kunst</h3>
+      <p class="artist">Copenhagen · National Gallery of Denmark</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless JSON API; whole collection crawlable in ~90 requests; direct <code>image_native</code> JPEGs plus IIIF</dd>
+        <dt>Dimensions</dt><dd>88,000+ works; ~40,000 with images</dd>
+        <dt>Provenance</dt><dd><a href="https://api.smk.dk/api/v1/docs">api.smk.dk</a></dd>
+      </dl>
+      <p class="credit">CC0, flagged per record. Europe's Cleveland — the finest ergonomics east of the Atlantic.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Paris Musées Open Content</h3>
+      <p class="artist">Paris · the fourteen museums of the city</p>
+      <dl>
+        <dt>Medium</dt><dd>GraphQL API, token free and self-service; HD image URLs in the response</dd>
+        <dt>Dimensions</dt><dd>~150,000 reproductions — Carnavalet, Petit Palais, Musée d'Art Moderne…</dd>
+        <dt>Provenance</dt><dd><a href="https://apicollections.parismusees.paris.fr/en">apicollections.parismusees.paris.fr</a></dd>
+      </dl>
+      <p class="credit">CC0 for public-domain works. The anchor of French open access.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Städel Museum</h3>
+      <p class="artist">Frankfurt am Main</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless OAI-PMH harvest (Dublin Core / LIDO); CDN image URLs in the records</dd>
+        <dt>Dimensions</dt><dd>22,000+ public-domain works with images</dd>
+        <dt>Provenance</dt><dd><a href="https://sammlung.staedelmuseum.de/en/oai/guide">sammlung.staedelmuseum.de/api/oai</a></dd>
+      </dl>
+      <p class="credit">Metadata CC0; images CC BY-SA, credit "Städel Museum". The cleanest German source.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Staatliche Museen zu Berlin</h3>
+      <p class="artist">Berlin · nineteen collections</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless JSON search (public but undocumented — pin your queries); deterministic hotlinks at <code>…/images/{id}_4000x4000.jpg</code></dd>
+        <dt>Dimensions</dt><dd>~270,000 records</dd>
+        <dt>Provenance</dt><dd><a href="https://recherche.smb.museum">recherche.smb.museum</a></dd>
+      </dl>
+      <p class="credit">CC BY-SA / Public Domain Mark subset, per-record license field.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Wien Museum</h3>
+      <p class="artist">Vienna</p>
+      <dl>
+        <dt>Medium</dt><dd>High-res CC0 downloads; the pipe is the catch — an undocumented backend, or their Wikimedia Commons uploads</dd>
+        <dt>Dimensions</dt><dd>134,000 records; 210,000 images</dd>
+        <dt>Provenance</dt><dd><a href="https://sammlung.wienmuseum.at/en/about-us/">sammlung.wienmuseum.at</a></dd>
+      </dl>
+      <p class="credit">CC0, commercial use included — the best-licensed collection in Austria.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Biblioteca Digital Hispánica</h3>
+      <p class="artist">Madrid · Biblioteca Nacional de España</p>
+      <dl>
+        <dt>Medium</dt><dd>Bulk datasets (BNElab), IIIF, SPARQL — all keyless</dd>
+        <dt>Dimensions</dt><dd>200,000+ digitized public-domain items</dd>
+        <dt>Provenance</dt><dd><a href="https://bnelab.bne.es/en/dataset/bne-digital/">bnelab.bne.es</a></dd>
+      </dl>
+      <p class="credit">CC BY 4.0, credit BNE, commercial included. Spain's open door.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>BnF Gallica</h3>
+      <p class="artist">Paris · Bibliothèque nationale de France</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless IIIF, SRU search, OAI-PMH — exemplary infrastructure</dd>
+        <dt>Dimensions</dt><dd>~10 million digitized documents, mostly public domain</dd>
+        <dt>Provenance</dt><dd><a href="https://api.bnf.fr">gallica.bnf.fr</a></dd>
+      </dl>
+      <p class="credit">Condition: free non-commercial reuse with credit "Source gallica.bnf.fr / BnF"; commercial use of the scans is fee-licensed.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Rijksmuseum</h3>
+      <p class="artist">Amsterdam</p>
+      <dl>
+        <dt>Medium</dt><dd>Data dumps and keyless IIIF via the new data platform; linked-data formats mean extra plumbing</dd>
+        <dt>Dimensions</dt><dd>~800,000 objects</dd>
+        <dt>Provenance</dt><dd><a href="https://data.rijksmuseum.nl">data.rijksmuseum.nl</a></dd>
+      </dl>
+      <p class="credit">CC0 / public domain wherever possible. The best non-US art collection that is genuinely open.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Science Museum Group</h3>
+      <p class="artist">London, York, Manchester, Bradford</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless JSON:API plus prebuilt CSVs of records with CC images — the MoMA workflow ready-made</dd>
+        <dt>Dimensions</dt><dd>500,000+ objects of science, industry and design</dd>
+        <dt>Provenance</dt><dd><a href="https://collection.sciencemuseumgroup.org.uk">collection.sciencemuseumgroup.org.uk</a></dd>
+      </dl>
+      <p class="credit">Metadata CC0; images CC BY-NC-SA — non-commercial, credited.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>DigiVatLib</h3>
+      <p class="artist">Vatican City · Biblioteca Apostolica Vaticana</p>
+      <dl>
+        <dt>Medium</dt><dd>First-class IIIF manifests per manuscript; harvest shelfmark lists, or Biblissima's aggregation</dd>
+        <dt>Dimensions</dt><dd>~25,000+ manuscripts fully digitized</dd>
+        <dt>Provenance</dt><dd><a href="https://digi.vatlib.it">digi.vatlib.it</a></dd>
+      </dl>
+      <p class="credit">CC BY-NC — non-commercial only. The closest thing to the Vatican with an open door.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Museo Egizio</h3>
+      <p class="artist">Turin · Italy's one open-access museum</p>
+      <dl>
+        <dt>Medium</dt><dd>Harvest via its Wikimedia Commons category and Wikidata — keyless, bulk, hotlink-friendly</dd>
+        <dt>Dimensions</dt><dd>~3,000 objects; ~5,500 images on Commons</dd>
+        <dt>Provenance</dt><dd><a href="https://collezioni.museoegizio.it">collezioni.museoegizio.it</a></dd>
+      </dl>
+      <p class="credit">CC0. Winner of Italy's first "Museo Open Culture" award — because it is the outlier.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Finna.fi &amp; the Nordic aggregators</h3>
+      <p class="artist">Helsinki · Oslo · Stockholm</p>
+      <dl>
+        <dt>Medium</dt><dd>Finna: keyless REST, CC0 metadata, rights-filterable. DigitaltMuseum: 4M+ objects, clean image URLs, one free key. K-samsök: replaced end of 2026 — don't lean on it</dd>
+        <dt>Dimensions</dt><dd>Millions of records across Finland, Norway, Sweden</dd>
+        <dt>Provenance</dt><dd><a href="https://api.finna.fi">api.finna.fi</a> · <a href="https://api.dimu.org/doc/public_api.html">api.dimu.org</a></dd>
+      </dl>
+      <p class="credit">Per-record licenses; filter to the CC0/PD subset. Nasjonalmuseet is reached through DigitaltMuseum.</p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════ ROOM III ══════════════ -->
+<section class="room">
+  <div class="room-door">
+    <p class="room-no">Room III</p>
+    <h2>Architecture</h2>
+    <p>The institutions devoted to architecture mostly guard their drawings; the open material hides in libraries, city archives, and one Berlin university.</p>
+  </div>
+  <div class="labels">
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Architekturmuseum der TU Berlin</h3>
+      <p class="artist">Berlin · drawings since the sixteenth century</p>
+      <dl>
+        <dt>Medium</dt><dd>CSV export of search results, LIDO XML per object, 3000px JPG downloads — no key</dd>
+        <dt>Dimensions</dt><dd>~163,000 catalogued; ~92,000 public-domain and downloadable</dd>
+        <dt>Provenance</dt><dd><a href="https://architekturmuseum.ub.tu-berlin.de">architekturmuseum.ub.tu-berlin.de</a></dd>
+      </dl>
+      <p class="credit">Public Domain Mark. Schinkel's Berlin, sheet by sheet — the architecture counterpart to Cleveland.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Historic American Buildings Survey</h3>
+      <p class="artist">Washington, D.C. · Library of Congress · HABS/HAER/HALS</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless JSON API, paged politely (~3s between requests); <code>image_url</code> arrays and IIIF on tile.loc.gov</dd>
+        <dt>Dimensions</dt><dd>~40,000+ surveyed sites; hundreds of thousands of photographs and measured drawings</dd>
+        <dt>Provenance</dt><dd><a href="https://www.loc.gov/collections/historic-american-buildings-landscapes-and-engineering-records/">loc.gov/collections/…hhh</a></dd>
+      </dl>
+      <p class="credit">United States government documentation — public domain. The great American building record.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Sanborn Fire Insurance Maps</h3>
+      <p class="artist">Library of Congress</p>
+      <dl>
+        <dt>Medium</dt><dd>Prebuilt CSV and JSON data package — the MoMA workflow, ready-made</dd>
+        <dt>Dimensions</dt><dd>~50,600 atlases; 440,048 colored map sheets of American cities</dd>
+        <dt>Provenance</dt><dd><a href="https://data.labs.loc.gov/sanborn/">data.labs.loc.gov/sanborn</a></dd>
+      </dl>
+      <p class="credit">Public domain. Urban plans as unintentional abstraction.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Julius Shulman Photography Archive</h3>
+      <p class="artist">Los Angeles · Getty Research Institute</p>
+      <dl>
+        <dt>Medium</dt><dd>IIIF-served digital collections; no tidy dump — budget a one-time catalogue scrape</dd>
+        <dt>Dimensions</dt><dd>48,000+ digitized photographs of mid-century modern architecture</dd>
+        <dt>Provenance</dt><dd><a href="https://libguides.getty.edu/julius-shulman/faq">getty.edu — Shulman archive</a></dd>
+      </dl>
+      <p class="credit">Getty holds the copyright and grants free download and publication with credit. Case Study Houses at golden hour.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Deutsche Fotothek</h3>
+      <p class="artist">Dresden · SLUB</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless OAI-PMH; an architectural-drawings portal of ~108,000 sheets; 250,000 images already on Wikimedia Commons</dd>
+        <dt>Dimensions</dt><dd>~2.5 million images online</dd>
+        <dt>Provenance</dt><dd><a href="https://www.deutschefotothek.de">deutschefotothek.de</a></dd>
+      </dl>
+      <p class="credit">Per-record: Public Domain Mark, CC BY-SA, or reserved — filter the rights field. The Commons subset is the easy way in.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Stadsarchief Amsterdam</h3>
+      <p class="artist">Amsterdam · the city's own drawings</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless OpenSearch API, a registered open dataset; high-res downloads</dd>
+        <dt>Dimensions</dt><dd>~500,000 photos, prints, maps and construction drawings</dd>
+        <dt>Provenance</dt><dd><a href="https://archief.amsterdam/beeldbank/">archief.amsterdam/beeldbank</a></dd>
+      </dl>
+      <p class="credit">Free reuse with credit "Stadsarchief Amsterdam". A city documenting itself.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Het Nieuwe Instituut</h3>
+      <p class="artist">Rotterdam · the Dutch national architecture collection</p>
+      <dl>
+        <dt>Medium</dt><dd>Linked Open Data platform with SPARQL; metadata open, image licensing per-object and unconfirmed</dd>
+        <dt>Dimensions</dt><dd>~4 million objects — Berlage, Rietveld, and after</dd>
+        <dt>Provenance</dt><dd><a href="https://collectiedata.hetnieuweinstituut.nl">collectiedata.hetnieuweinstituut.nl</a></dd>
+      </dl>
+      <p class="credit">Condition: prototype a SPARQL query for openly licensed reproductions before committing.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>RCE Beeldbank &amp; the Danish drawings</h3>
+      <p class="artist">Amersfoort · Copenhagen</p>
+      <dl>
+        <dt>Medium</dt><dd>RCE: keyless OAI-PMH, ~750k–1M photos of Dutch monuments, CC BY-SA. Royal Danish Library: ~300,000 architectural drawings, keyless API, rights per record</dd>
+        <dt>Provenance</dt><dd><a href="https://opendata.picturae.com/dataset/rce_oai_webservice">opendata.picturae.com</a> · <a href="https://www.kb.dk/en/find-materials/collections/architecture-collection">kb.dk</a></dd>
+      </dl>
+      <p class="credit">Condition: XML harvesting tooling for one; a licensing spike for the other.</p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════ ROOM IV ══════════════ -->
+<section class="room">
+  <div class="room-door">
+    <p class="room-no">Room IV</p>
+    <h2>Beyond the Frame</h2>
+    <p>Space, anatomy, botany, book plates, maps of everywhere — the collections nobody calls art until they are hung one at a time, full screen.</p>
+  </div>
+  <div class="labels">
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>NASA Image and Video Library</h3>
+      <p class="artist">United States · every mission, every center</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless REST at <code>images-api.nasa.gov</code>; direct S3-backed asset URLs</dd>
+        <dt>Dimensions</dt><dd>100,000+ curated images</dd>
+        <dt>Provenance</dt><dd><a href="https://images.nasa.gov">images.nasa.gov</a></dd>
+      </dl>
+      <p class="credit">Public domain, insignia excepted. The overview effect as a random draw.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Wellcome Collection</h3>
+      <p class="artist">London · medicine, anatomy, the body</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless modern JSON API with license filtering; full IIIF</dd>
+        <dt>Dimensions</dt><dd>Millions of digitized images</dd>
+        <dt>Provenance</dt><dd><a href="https://developers.wellcomecollection.org">developers.wellcomecollection.org</a></dd>
+      </dl>
+      <p class="credit">Filter <code>license=cc0|pdm</code> in the query itself. Possibly the easiest API in this building.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Biodiversity Heritage Library</h3>
+      <p class="artist">Worldwide · natural history before 1923</p>
+      <dl>
+        <dt>Medium</dt><dd>Bulk exports on AWS Open Data; page images at <code>biodiversitylibrary.org/pageimage/{id}</code>; the curated 320k-image Flickr set is the shortcut</dd>
+        <dt>Dimensions</dt><dd>300,000+ curated illustrations; 55 million scanned pages</dd>
+        <dt>Provenance</dt><dd><a href="https://registry.opendata.aws/bhl-open-data/">registry.opendata.aws/bhl-open-data</a></dd>
+      </dl>
+      <p class="credit">Overwhelmingly public domain. Every bird ever engraved.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Internet Archive — the vetted rooms</h3>
+      <p class="artist">San Francisco · everything, so choose carefully</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless cursor-based scrape API; thumbs at <code>archive.org/services/img/{id}</code></dd>
+        <dt>Dimensions</dt><dd>WPA posters, book plates, and the USDA Pomological Watercolors — 7,584 public-domain fruit portraits</dd>
+        <dt>Provenance</dt><dd><a href="https://archive.org/details/usda-pomological-watercolor-collection">archive.org — USDA watercolors</a></dd>
+      </dl>
+      <p class="credit">License per collection — shard only from the vetted public-domain rooms. The fruit alone justifies a site.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Wikidata → Wikimedia Commons</h3>
+      <p class="artist">Everywhere · the museum of record for closed museums</p>
+      <dl>
+        <dt>Medium</dt><dd>SPARQL at build time; hotlink via <code>Special:FilePath</code> (rename-proof); structured captions for free</dd>
+        <dt>Dimensions</dt><dd>Effectively infinite — bridges, brutalism, lighthouses, or every public-domain Louvre painting</dd>
+        <dt>Provenance</dt><dd><a href="https://query.wikidata.org">query.wikidata.org</a></dd>
+      </dl>
+      <p class="credit">Per-file licenses; bake attribution into the caption. The general-purpose engine of the whole enterprise.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>The British Library's million</h3>
+      <p class="artist">London · via Flickr Commons</p>
+      <dl>
+        <dt>Medium</dt><dd>The library's own services remain crippled since the 2023 ransomware attack; the Mechanical Curator set on Flickr survives untouched</dd>
+        <dt>Dimensions</dt><dd>~1,073,000 public-domain book illustrations, 17th–19th century</dd>
+        <dt>Provenance</dt><dd><a href="https://www.flickr.com/photos/britishlibrary">flickr.com/photos/britishlibrary</a></dd>
+      </dl>
+      <p class="credit">Public domain. Condition: a free Flickr API key to harvest.</p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════ ROOM V ══════════════ -->
+<section class="room">
+  <div class="room-door">
+    <p class="room-no">Room V</p>
+    <h2>The Sculpture Court</h2>
+    <p>Objects in the round. One collection makes a random-3D-object site as easy as the original — verified live, CORS headers and all.</p>
+  </div>
+  <div class="labels">
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Smithsonian Open Access 3D</h3>
+      <p class="artist">Washington, D.C. · Digitization Program Office</p>
+      <dl>
+        <dt>Medium</dt><dd>Public S3 bucket, anonymously listable; Draco GLBs at three levels of detail (~1–2 MB), poster JPEGs, titles in <code>scene.svx.json</code>; <code>Access-Control-Allow-Origin: *</code> confirmed — loads straight into <code>&lt;model-viewer&gt;</code></dd>
+        <dt>Dimensions</dt><dd>~2,360 3D packages — gunboats, gems, Lincoln's life mask</dd>
+        <dt>Provenance</dt><dd><a href="https://3d.si.edu">3d.si.edu</a></dd>
+      </dl>
+      <p class="credit">CC0 (confirm per record at build time). No server, no proxy, no key — the whole MoMA pattern, in three dimensions.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Three D Scans</h3>
+      <p class="artist">Oliver Laric · since 2012</p>
+      <dl>
+        <dt>Medium</dt><dd>STL/OBJ files, no API — convert to GLB and self-host</dd>
+        <dt>Dimensions</dt><dd>~150+ museum sculpture scans of unusual quality</dd>
+        <dt>Provenance</dt><dd><a href="https://threedscans.com">threedscans.com</a></dd>
+      </dl>
+      <p class="credit">No copyright restrictions — the cleanest license in the court. Condition: conversion labour.</p>
+    </article>
+
+    <article class="label" data-status="closed">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Sketchfab, in memoriam</h3>
+      <p class="artist">Absorbed into Epic's Fab, 2025–26</p>
+      <dl>
+        <dt>Condition report</dt><dd>CC0 and CC-SA licenses do not exist on Fab; affected models lose their downloads; the old download API is explicitly temporary</dd>
+      </dl>
+      <p class="credit">Do not build on a platform mid-demolition. The Smithsonian's own bucket outlives it.</p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════ ROOM VI ══════════════ -->
+<section class="room">
+  <div class="room-door">
+    <p class="room-no">Room VI</p>
+    <h2>The ETH Annex</h2>
+    <p>Zürich's library has digitized a million images; the open doors are a rare-book portal and a Wikimedia mirror.</p>
+  </div>
+  <div class="labels">
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Media contributed by the ETH-Bibliothek</h3>
+      <p class="artist">Zürich → Wikimedia Commons</p>
+      <dl>
+        <dt>Medium</dt><dd>One category harvest via the keyless Commons API; hotlink-proof URLs; machine-readable license per file</dd>
+        <dt>Dimensions</dt><dd>~60,000+ files — Swissair aerial photography, Comet press archive, portraits</dd>
+        <dt>Provenance</dt><dd><a href="https://commons.wikimedia.org/wiki/Category:Media_contributed_by_the_ETH-Bibliothek">commons.wikimedia.org — ETH-Bibliothek</a></dd>
+      </dl>
+      <p class="credit">Public domain and CC BY-SA only. The practical route to E-Pics' million images.</p>
+    </article>
+
+    <article class="label" data-status="open">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>e-rara</h3>
+      <p class="artist">Zürich · Swiss rare prints, 15th–19th century</p>
+      <dl>
+        <dt>Medium</dt><dd>Keyless OAI-PMH at <code>e-rara.ch/oai</code>; full IIIF per page</dd>
+        <dt>Dimensions</dt><dd>100,000+ digitized books, maps, and prints</dd>
+        <dt>Provenance</dt><dd><a href="https://www.e-rara.ch">e-rara.ch</a></dd>
+      </dl>
+      <p class="credit">Public domain. Mine it for plates, maps and title pages rather than whole books.</p>
+    </article>
+
+    <article class="label" data-status="cond">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>E-Pics Bildarchiv &amp; the Thomas-Mann-Archiv</h3>
+      <p class="artist">Zürich · ETH-Bibliothek</p>
+      <dl>
+        <dt>Medium</dt><dd>One million images, ~93% freely downloadable — but bulk metadata needs a registered Developer-Portal key, and the CDN URLs are medium-stability</dd>
+        <dt>Provenance</dt><dd><a href="https://ba.e-pics.ethz.ch">ba.e-pics.ethz.ch</a></dd>
+      </dl>
+      <p class="credit">Public Domain Mark / CC BY-SA. Footnote for 2026: Thomas Mann has entered the public domain, and the archive is publishing him openly.</p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════ THE VAULT ══════════════ -->
+<section class="room vault">
+  <div class="room-door">
+    <p class="room-no">Lower Level</p>
+    <h2>The Vault</h2>
+    <p>Collections you may visit but not take home. Their public-domain works escape through Wikimedia Commons; the institutions themselves are closed to this build.</p>
+  </div>
+  <div class="labels">
+
+    <article class="label" data-status="closed">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Louvre · Orsay · Pompidou</h3>
+      <p class="artist">Paris</p>
+      <dl><dt>Condition report</dt><dd>Per-object JSON but no enumeration; images restricted to private and educational use; Orsay offers nothing; Pompidou's century is still in copyright</dd></dl>
+      <p class="credit">Take the Commons route.</p>
+    </article>
+
+    <article class="label" data-status="closed">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Prado · Uffizi · Vatican Museums</h3>
+      <p class="artist">Madrid · Florence · Vatican City</p>
+      <dl><dt>Condition report</dt><dd>A commercial image bank; a browse-only archive under a fee-based reproduction regime; a catalogue still "in implementation," no API at all</dd></dl>
+      <p class="credit">Sophisticated inside, sealed outside.</p>
+    </article>
+
+    <article class="label" data-status="closed">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>British Museum · NPG · National Gallery</h3>
+      <p class="artist">London</p>
+      <dl><dt>Condition report</dt><dd>No API or dump and CC BY-NC-SA; no programmatic access and low-res ND terms; CC0 data but NC-ND images on a deprecated server</dd></dl>
+      <p class="credit">Announced openings that never quite opened.</p>
+    </article>
+
+    <article class="label" data-status="closed">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>The architecture keepers</h3>
+      <p class="artist">RIBA · CCA · TU München · Cité de l'architecture · Az W</p>
+      <dl><dt>Condition report</dt><dd>Rights-managed picture libraries, fee-based reproductions, or NC-ND with written-permission clauses</dd></dl>
+      <p class="credit">The discipline's own museums, closed to the discipline.</p>
+    </article>
+
+    <article class="label" data-status="closed">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>The estates</h3>
+      <p class="artist">Le Corbusier · Frank Lloyd Wright · Aalto · Bauhaus-Archiv</p>
+      <dl><dt>Condition report</dt><dd>ADAGP rights until 2036; JSTOR-gated; paid research service; ~500 works online without licenses</dd></dl>
+      <p class="credit">Modernism remains privately held.</p>
+    </article>
+
+    <article class="label" data-status="closed">
+      <span class="dot" aria-hidden="true"></span>
+      <h3>Fallen repositories</h3>
+      <p class="artist">Carnegie · Tate · Cooper Hewitt · Harvard · Canmore</p>
+      <dl><dt>Condition report</dt><dd>A deleted repo; a dump frozen in 2014 without images; one frozen in 2017; terms forbidding caches older than two weeks; a service switched off in 2025</dd></dl>
+      <p class="credit">Open access is a practice, not a press release.</p>
+    </article>
+
+  </div>
+</section>
+
+<footer class="colophon">
+  <p>Catalogue compiled July 2026 from <code>RESEARCH.md</code> on the <em>research</em> branch of ShowMeMo ·
+  every claim verified against official documentation, several live against the wire ·
+  the full condition reports, with sources, hang in <a href="https://github.com/schaferjart/ShowMeMo/pull/4">pull request #4</a>.</p>
+</footer>
+
+</div>
+
+<div class="plaque">
+  <button id="shuffle" type="button" title="Spotlight a random acquisition-ready exhibit (Space / R)">Random exhibit</button>
+</div>
+
+<script>
+(() => {
+  const open = Array.from(document.querySelectorAll('article.label[data-status="open"]'));
+  let current = null;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function spotlight() {
+    if (!open.length) return;
+    let next;
+    do { next = open[Math.floor(Math.random() * open.length)]; }
+    while (open.length > 1 && next === current);
+    if (current) current.classList.remove('lit');
+    current = next;
+    current.classList.add('lit');
+    current.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+  }
+  document.getElementById('shuffle').addEventListener('click', spotlight);
+  document.addEventListener('keydown', (e) => {
+    if (e.target.closest('input, textarea, select')) return;
+    if (e.code === 'Space' || e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      spotlight();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
