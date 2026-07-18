@@ -197,6 +197,76 @@ Commons is the de-facto open channel for their public-domain works.
 
 No bulk data and/or no open images as of 2026: **Louvre** (per-object JSON exists but no enumeration; images restricted to private/educational use), **Musée d'Orsay**, **Centre Pompidou** (modern art = in-copyright, structurally closed), **Vatican Museums** (browse-only catalogue, no API), **Uffizi** (browse-only, fee-based reproduction regime), **Prado** (commercial image bank), **British Museum** (no API or dump, CC BY-NC-SA, SPARQL endpoint long-unreliable), **National Portrait Gallery London** (no API, restrictive), **KHM Wien** (non-commercial only, no API), **National Gallery London** (CC0 data but CC BY-NC-ND images and a still-unstable API transition). Public-domain works from all of these are abundantly available on **Wikimedia Commons** via third-party photography — the Wikidata→Commons pipeline from Tier 1 is the practical way to build "a random Louvre/Prado painting" site.
 
+## Architecture — dedicated archives
+
+Beyond LoC HABS, Sanborn, RCE, and the Wikidata route (Tier 1 above), a sweep
+of the specialist architecture museums and archives (verified July 2026). The
+sobering pattern: most *dedicated* architecture institutions — RIBA, CCA
+Montreal, TU München, Cité de l'architecture, Az W Wien, and the architect
+foundations (Le Corbusier, Frank Lloyd Wright, Aalto, Bauhaus-Archiv) — are
+closed: image licensing is commercial or on-request, and 20th-century
+architects' estates keep copyright in force (Corbusier until 2036). What *is*
+open:
+
+### Ship-ready
+
+- **Architekturmuseum der TU Berlin** — **the best find**: ~163k catalogued
+  works, of which **~92k are downloadable 3000px JPGs under Public Domain
+  Mark** (creators dead >70 years; Schinkel-era Berlin especially strong).
+  Search results export as **CSV**, per-object LIDO XML, no key. Essentially
+  the MoMA workflow for architectural drawings. (Verify the CSV export
+  parameters and image URL pattern by hand — the site blocked this sandbox's
+  proxy; fallback: the same objects flow into Deutsche Fotothek/DDB.)
+- **Deutsche Fotothek (SLUB Dresden)** — ~2.5M images online with vast
+  architecture photography, plus a dedicated **architectural & engineering
+  drawings portal (~108k sheets** aggregating SLUB, TU Berlin, TU München,
+  Mecklenburg). Keyless OAI-PMH (`digital.slub-dresden.de/oai`); licenses are
+  per-record (PDM / CC BY-SA / rights-reserved) so filter on the rights field;
+  the ~250k images donated to Wikimedia Commons (`Fotothek df_*`, CC BY-SA)
+  are the lowest-friction subset.
+- **Nasjonalmuseet Norway's architecture collection (NMK-A)** via the
+  DigitaltMuseum API — Sverre Fehn et al.; CC0 metadata, CC BY photo files,
+  stable resizable image URLs; needs the free KulturIT key (see Europe
+  section).
+- **Getty — Julius Shulman Photography Archive** — 48k+ digitized high-res
+  photos of mid-century modern architecture; Getty holds the copyright and
+  explicitly allows free download and publication with credit; IIIF-served.
+  No tidy dump — budget a one-time catalogue scrape.
+- **Stadsarchief Amsterdam Beeldbank** — ~500k photos, prints, and
+  **construction drawings** of Amsterdam; keyless OpenSearch API (registered
+  open dataset), high-res downloads, free reuse with credit. City-scoped but
+  squarely on-topic.
+- **K-samsök / Bebyggelseregistret (Sweden)** — buildings-register and county
+  museum photography via the free aggregator API; CC0 metadata, per-record CC
+  image licenses (but note the platform is being replaced end of 2026 — see
+  Europe section).
+
+### Needs a spike first
+
+- **Het Nieuwe Instituut (Rotterdam)** — the ~4M-item Dutch national
+  architecture collection now has a Linked Open Data platform + SPARQL
+  endpoint (`collectiedata.hetnieuweinstituut.nl`), metadata open — but image
+  availability and licensing are per-object and unconfirmed. Prototype a
+  SPARQL query filtering for openly licensed reproductions before committing.
+- **Royal Danish Library — Samlingen af Arkitekturtegninger** — ~300k Danish
+  architectural drawings, keyless API + OAI-PMH (`api.kb.dk`), but rights are
+  per-record, not blanket-open. Its "Danmark set fra luften" aerial-photo API
+  (free with credit) is a safe adjacent win.
+
+### Flagged closed (verified)
+
+**RIBApix** (rights-managed, paid publication licenses), **CCA Montreal**
+(fee-based reproductions, no API), **Architekturmuseum TU München** (CC
+BY-NC-ND *plus* written-permission clause — metadata harvestable via OAI-PMH,
+images unusable; its PD sheets surface in Deutsche Fotothek instead), **Cité
+de l'architecture**, **Az W Wien** (prepaid reproduction fees), **Fondation Le
+Corbusier** (ADAGP rights until 2036), **Frank Lloyd Wright/Avery**
+(JSTOR-gated), **Alvar Aalto Foundation** (paid research service),
+**Bauhaus-Archiv** (~500 works online, no licensing), **SAH Archipedia** (open
+to read, no bulk, per-image rights), **Mapillary** (CC BY-SA but API image
+URLs are time-limited signed URLs — breaks static hotlinking), **Denmark FBB**
+(login-gated exports, image-poor).
+
 ## Recommendations
 
 Ranked by effort-to-payoff for a sibling Distractor:
@@ -211,6 +281,7 @@ Ranked by effort-to-payoff for a sibling Distractor:
 8. **ETH via Wikimedia Commons or e-rara** *(ETH)* — the two ETH routes that are open, keyless, and bulk-harvestable today.
 9. **SMK Denmark** *(Europe)* — the European source that matches Cleveland/AIC friction levels: keyless API, CC0, image URLs in the response; **Paris Musées** and **Städel** follow close behind.
 10. For "a random Louvre/Prado/British Museum painting": those institutions are closed — go through **Wikimedia Commons/Wikidata** instead.
+11. **TU Berlin Architekturmuseum** *(architecture)* — ~92k public-domain architectural drawings as 3000px JPGs with CSV export: the architecture-drawing counterpart to Cleveland. Pair with **LoC HABS** (photos) and **Getty Shulman** (mid-century modern) for a full architecture Distractor family.
 
 A note on verification: dataset locations and rate limits above were verified
 against official docs and repos in July 2026, but a smoke test of the top
