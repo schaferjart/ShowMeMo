@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Distractor: MoMA</title>
+<meta name="description" content="One random work from The Museum of Modern Art.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <div id="stage"></div>
+</main>
+
+<div class="controls">
+  <button id="refresh" type="button" aria-label="Show another work" title="Another work (R)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+      <path d="M20 4v5h-5"/>
+    </svg>
+  </button>
+  <button id="download" type="button" aria-label="Download image" title="Download image">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>
+    </svg>
+  </button>
+</div>
+
+<div id="bottom">
+  <aside id="caption">
+    <button id="cap-summary" type="button" aria-expanded="false" aria-controls="cap-details" title="More about this work (I)">
+      <em id="cap-title"></em><span id="cap-meta"></span>
+    </button>
+    <div id="cap-details" hidden>
+      <p id="cap-medium"></p>
+      <p id="cap-credit"></p>
+      <p class="cap-row">
+        <a id="cap-link" href="" target="_blank" rel="noopener">View at MoMA</a>
+        <button id="cap-close" type="button" aria-label="Close details">&times;</button>
+      </p>
+    </div>
+  </aside>
+  <footer>A random work from The Museum of Modern Art // J. A. Schafer 2026</footer>
+</div>
+
+<noscript><p class="noscript">This page needs JavaScript to pick a random artwork.</p></noscript>
+
+<script src="app.js"></script>
+</body>
+</html>
