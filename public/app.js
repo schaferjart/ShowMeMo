@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const img = document.getElementById('artwork');
+  const viewer = document.getElementById('artwork');
   const refreshBtn = document.getElementById('refresh');
   const captionBtn = document.getElementById('toggle-caption');
   const caption = document.getElementById('caption');
@@ -13,10 +13,8 @@
   const capLink = document.getElementById('cap-link');
 
   const params = new URLSearchParams(location.search);
-  const onViewOnly = params.get('onview') === '1';
 
   let meta = null;
-  let preloaded = null; // { record, image } fetched ahead of time
   let errorStreak = 0;
   const shardCache = new Map();
 
@@ -42,23 +40,24 @@
       } catch {
         continue;
       }
-      if (onViewOnly) records = records.filter((r) => r.OnView);
       if (records.length) {
         return records[Math.floor(Math.random() * records.length)];
       }
     }
-    throw new Error('No works found');
+    throw new Error('No objects found');
   }
 
   function show(record) {
-    img.classList.remove('loaded');
-    img.alt = [record.Title, record.Artist].filter(Boolean).join(' — ');
-    img.src = record.ImageURL;
+    viewer.classList.remove('loaded');
+    viewer.alt = record.Title;
+    if (record.PosterURL) viewer.poster = record.PosterURL;
+    viewer.src = record.GlbURL;
 
     capTitle.textContent = record.Title;
-    capArtist.textContent = record.Artist;
-    capDate.textContent = record.Date;
-    capMedium.textContent = record.Medium;
+    capArtist.textContent = '';
+    capDate.textContent = '';
+    capMedium.textContent =
+      record.Medium && record.Medium !== record.Title ? record.Medium : '';
     capCredit.textContent = record.CreditLine;
     capLink.parentElement.hidden = !record.URL;
     if (record.URL) capLink.href = record.URL;
@@ -68,29 +67,18 @@
     history.replaceState(null, '', url);
   }
 
-  function preloadNext() {
-    pickRandom().then((record) => {
-      const image = new Image();
-      image.src = record.ImageURL;
-      preloaded = { record, image };
-    }, () => {});
-  }
-
   async function next() {
-    const candidate = preloaded;
-    preloaded = null;
-    show(candidate ? candidate.record : await pickRandom());
-    preloadNext();
+    show(await pickRandom());
   }
 
-  img.addEventListener('load', () => {
+  viewer.addEventListener('load', () => {
     errorStreak = 0;
-    img.classList.add('loaded');
+    viewer.classList.add('loaded');
   });
 
-  // Some image URLs will have rotted; silently move on to another work.
-  img.addEventListener('error', () => {
-    if (!meta || !img.src || ++errorStreak > 10) return;
+  // Some packages will have rotted; silently move on to another object.
+  viewer.addEventListener('error', () => {
+    if (!meta || ++errorStreak > 10) return;
     next();
   });
 
@@ -125,6 +113,5 @@
       } catch {}
     }
     show(record || (await pickRandom()));
-    preloadNext();
   })();
 })();

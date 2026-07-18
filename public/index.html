@@ -3,18 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Distractor: MoMA</title>
-<meta name="description" content="One random work from The Museum of Modern Art.">
+<title>Distractor: Smithsonian 3D</title>
+<meta name="description" content="One random 3D object from Smithsonian Open Access.">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
+<script type="module" src="model-viewer.min.js"></script>
 </head>
 <body>
 <main>
-  <img id="artwork" alt="" decoding="async">
+  <model-viewer id="artwork" alt="" camera-controls auto-rotate auto-rotate-delay="1500"
+    interaction-prompt="none" shadow-intensity="1" exposure="1"></model-viewer>
 </main>
 
 <div class="controls">
-  <button id="refresh" type="button" aria-label="Show another work" title="Another work (R)">
+  <button id="refresh" type="button" aria-label="Show another object" title="Another object (R)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
       <path d="M20 4v5h-5"/>
@@ -33,12 +35,12 @@
   <p id="cap-date"></p>
   <p id="cap-medium"></p>
   <p id="cap-credit"></p>
-  <p><a id="cap-link" href="" target="_blank" rel="noopener">View at MoMA</a></p>
+  <p><a id="cap-link" href="" target="_blank" rel="noopener">View at the Smithsonian</a></p>
 </aside>
 
-<footer>A random work from The Museum of Modern Art // J. A. Schafer 2026</footer>
+<footer>A random 3D object from Smithsonian Open Access // J. A. Schafer 2026</footer>
 
-<noscript><p class="noscript">This page needs JavaScript to pick a random artwork.</p></noscript>
+<noscript><p class="noscript">This page needs JavaScript to pick a random object.</p></noscript>
 
 <script src="app.js"></script>
 </body>
