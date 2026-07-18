@@ -49,10 +49,10 @@ python3 -m http.server 8000 -d public
 
 ### GitHub Pages
 
-`.github/workflows/pages.yml` builds the dataset and deploys `public/` to
-GitHub Pages on every push to `main`. The site is served at
-<https://schaferjart.github.io/ShowMeMo/>. To refresh the dataset, re-run the
-workflow from the Actions tab (`workflow_dispatch`).
+`.github/workflows/pages.yml` builds the dataset and force-pushes `public/`
+as a single orphan commit to the `gh-pages` branch on every push to `main`.
+The site is served at <https://schaferjart.github.io/ShowMeMo/>. To refresh
+the dataset, re-run the workflow from the Actions tab (`workflow_dispatch`).
 
 ### Docker / Coolify
 
