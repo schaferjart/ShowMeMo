@@ -5,7 +5,8 @@ A single-serving site in the spirit of James Bridle's
 from [The Museum of Modern Art's collection dataset](https://github.com/MuseumofModernArt/collection),
 full screen, with almost no interface.
 
-- The artwork fills the viewport.
+- The artwork fills the viewport; the works you saw before remain beneath it,
+  neatly piled — straight, slightly offset, dimmed — up to six deep.
 - The refresh button (or `Space` / `R`) loads another random work.
 - The download button saves the image.
 - Title, artist, and year are always visible at the bottom; clicking them
