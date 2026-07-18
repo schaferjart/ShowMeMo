@@ -77,19 +77,18 @@ main {
   height: 20px;
 }
 
-#caption {
+#bottom {
   position: fixed;
-  left: 16px;
-  bottom: 32px;
-  max-width: min(48ch, calc(100vw - 32px));
-  font-size: 13px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 28px 16px 10px;
+  background: linear-gradient(to top, var(--bg) 65%, transparent);
 }
 
-#caption.open {
-  padding: 12px 14px;
-  background: var(--panel);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+#caption {
+  max-width: min(48ch, 100%);
+  font-size: 13px;
 }
 
 #cap-summary {
@@ -124,7 +123,7 @@ main {
 }
 
 #cap-details {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 #cap-details p {
@@ -167,11 +166,9 @@ main {
   opacity: 1;
 }
 
+/* A blank line's worth of space keeps the credit line distinct from the caption. */
 footer {
-  position: fixed;
-  bottom: 10px;
-  left: 0;
-  right: 0;
+  margin-top: 14px;
   text-align: center;
   font-size: 11px;
   opacity: 0.35;
