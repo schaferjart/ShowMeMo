@@ -1,55 +1,62 @@
-// Downloads MoMA's Artworks.csv, filters to works with images, and shards the
-// records into small JSON files under public/data/.
+// Builds public/data/ from the NASA Image and Video Library
+// (https://images.nasa.gov, keyless): sweeps a set of topic queries
+// through the search API, dedupes by nasa_id, and shards the records.
 //
-// Sharding is by `ObjectID % shardCount`, so a permalink lookup needs only
-// meta.json plus a single shard — no index file.
+// NOTE: images-api.nasa.gov is not reachable from every sandboxed
+// environment; this branch is normally built by the build-distractors
+// GitHub Actions workflow.
+//
+// ObjectID is the record's index in the snapshot, so permalinks are
+// best-effort across rebuilds.
 
-import { parse } from 'csv-parse';
-import { Readable } from 'node:stream';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-// The CSV lives in Git LFS; the plain raw.githubusercontent.com URL returns
-// only an LFS pointer file, so fetch the media URL instead.
-const CSV_URL =
-  'https://media.githubusercontent.com/media/MuseumofModernArt/collection/main/Artworks.csv';
-
+const API = 'https://images-api.nasa.gov/search';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
 const TARGET_SHARD_BYTES = 40_000; // headroom under the ~50 KB ceiling
+const QUERIES = [
+  'apollo', 'gemini', 'mercury program', 'space shuttle', 'international space station',
+  'hubble', 'webb telescope', 'mars', 'moon', 'earth', 'saturn', 'jupiter', 'venus',
+  'nebula', 'galaxy', 'astronaut', 'launch', 'spacewalk', 'voyager', 'artemis',
+];
+const MAX_PAGES = 100; // the API refuses to page past 10,000 results per query
 
-console.error(`Downloading ${CSV_URL} ...`);
-const res = await fetch(CSV_URL);
-if (!res.ok) {
-  throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
+const byId = new Map();
+for (const q of QUERIES) {
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const url = `${API}?q=${encodeURIComponent(q)}&media_type=image&page_size=100&page=${page}`;
+    const res = await fetch(url);
+    if (!res.ok) break; // past the last page the API returns 400
+    const items = (await res.json()).collection?.items ?? [];
+    if (!items.length) break;
+    for (const item of items) {
+      const data = item.data?.[0];
+      const thumb = item.links?.find((l) => l.rel === 'preview')?.href;
+      if (!data?.nasa_id || !thumb || byId.has(data.nasa_id)) continue;
+      // Skip items whose description asserts third-party copyright.
+      if (/copyright/i.test(data.description ?? '') && !/no copyright/i.test(data.description ?? '')) continue;
+      byId.set(data.nasa_id, {
+        Title: (data.title ?? '').trim(),
+        Artist: (data.photographer ?? data.secondary_creator ?? '').trim(),
+        Date: (data.date_created ?? '').slice(0, 10),
+        Medium: (data.center ?? '').trim(),
+        CreditLine: 'NASA Image and Video Library (public domain)',
+        URL: `https://images.nasa.gov/details/${encodeURIComponent(data.nasa_id)}`,
+        ImageURL: thumb.replace('~thumb.', '~medium.').replace(/^http:/, 'https:'),
+      });
+    }
+  }
+  console.error(`  ${q}: ${byId.size} total ...`);
 }
 
-// Stream straight into the CSV parser. The file starts with a UTF-8 BOM and
-// fields contain quoted commas and escaped quotes; csv-parse handles all that.
-const parser = Readable.fromWeb(res.body).pipe(
-  parse({ bom: true, columns: true, relax_column_count: true })
-);
-
-const works = [];
-let total = 0;
-for await (const row of parser) {
-  total++;
-  const imageURL = (row.ImageURL ?? '').trim();
-  if (!imageURL) continue;
-  const objectID = Number(row.ObjectID);
-  if (!Number.isInteger(objectID) || objectID < 0) continue;
-  const record = {
-    ObjectID: objectID,
-    Title: (row.Title ?? '').trim(),
-    Artist: (row.Artist ?? '').trim(),
-    Date: (row.Date ?? '').trim(),
-    Medium: (row.Medium ?? '').trim(),
-    CreditLine: (row.CreditLine ?? '').trim(),
-    URL: (row.URL ?? '').trim(),
-    ImageURL: imageURL,
-  };
-  if ((row.OnView ?? '').trim()) record.OnView = 1;
-  works.push(record);
+const works = [...byId.values()];
+if (works.length < 100) {
+  throw new Error(`Only ${works.length} items harvested — API shape changed?`);
 }
+
+works.sort((a, b) => (a.URL < b.URL ? -1 : a.URL > b.URL ? 1 : 0));
+works.forEach((w, i) => (w.ObjectID = i));
 
 const totalBytes = works.reduce((sum, w) => sum + JSON.stringify(w).length + 1, 0);
 const shardCount = Math.max(1, Math.ceil(totalBytes / TARGET_SHARD_BYTES));
@@ -65,15 +72,9 @@ await Promise.all(
   shards.map((shard, n) => writeFile(`${OUT_DIR}shard-${n}.json`, JSON.stringify(shard)))
 );
 
-const meta = {
-  totalWorks: works.length,
-  shardCount,
-  builtAt: new Date().toISOString(),
-};
-await writeFile(`${OUT_DIR}meta.json`, JSON.stringify(meta));
-
-const largest = Math.max(...shards.map((s) => JSON.stringify(s).length));
-console.error(
-  `Parsed ${total} records; wrote ${shardCount} shards (largest ${(largest / 1024).toFixed(1)} KB).`
+await writeFile(
+  `${OUT_DIR}meta.json`,
+  JSON.stringify({ totalWorks: works.length, shardCount, builtAt: new Date().toISOString() })
 );
-console.log(`${works.length} works with images.`);
+
+console.log(`${works.length} images.`);
