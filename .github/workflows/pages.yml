@@ -1,0 +1,38 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - hpbda
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Publish public/ into the hpbda/ subfolder of gh-pages, leaving the
+      # root site and the rest of the Distractor fleet untouched. The page
+      # reads the artwork dataset from the root deploy's /data/, so no build
+      # step is needed here.
+      - name: Publish to gh-pages
+        run: |
+          git fetch --depth 1 origin gh-pages
+          git worktree add ../pages origin/gh-pages
+          cd ../pages
+          rm -rf hpbda
+          mkdir hpbda
+          cp -r "$GITHUB_WORKSPACE/public/." hpbda/
+          rm -rf hpbda/data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Deploy hpbda from $GITHUB_SHA" || echo "No changes"
+          git push origin HEAD:gh-pages

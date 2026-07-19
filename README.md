@@ -5,9 +5,13 @@ A single-serving site in the spirit of James Bridle's
 from [The Museum of Modern Art's collection dataset](https://github.com/MuseumofModernArt/collection),
 full screen, with almost no interface.
 
-- The artwork fills the viewport.
+- The artwork fills the viewport; the works you saw before remain beneath it,
+  neatly piled — straight, slightly offset, dimmed — up to six deep.
 - The refresh button (or `Space` / `R`) loads another random work.
-- The plus button (or `I`) toggles the caption.
+- The download button saves the image.
+- Title, artist, and year are always visible at the bottom; clicking them
+  reveals medium, credit line, and a link to the work at MoMA
+  (the `×`, `Esc`, or `I` closes it again).
 - `?id=<ObjectID>` permalinks to a specific work; the URL always reflects the
   work on screen.
 - `?onview=1` restricts the random picks to works currently on view at MoMA.
@@ -46,6 +50,15 @@ python3 -m http.server 8000 -d public
 ```
 
 ## Deploy
+
+### GitHub Pages
+
+`.github/workflows/pages.yml` builds the dataset and force-pushes `public/`
+as a single orphan commit to the `gh-pages` branch on every push to `main`.
+The site is served at <https://schaferjart.github.io/ShowMeMo/>. To refresh
+the dataset, re-run the workflow from the Actions tab (`workflow_dispatch`).
+
+### Docker / Coolify
 
 The `Dockerfile` is a two-stage build: a Node stage runs `build.mjs` (so the
 image always ships a fresh dataset), then `nginx:alpine` serves `public/` with
