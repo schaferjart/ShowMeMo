@@ -19,6 +19,19 @@ verified July 2026.
 > Actions workflow (see the PR from `claude/build-distractors-workflow`)
 > builds them on GitHub's runners and deploys `/smk/`, `/nasa/`,
 > `/wellcome/`. Paris Musées still needs a self-service account token.
+>
+> The European wing has since grown: **Fitzwilliam/Cambridge is live**
+> ([site](https://schaferjart.github.io/ShowMeMo/fitzwilliam/),
+> `distractor/fitzwilliam`, built from the museum's CC0 GitHub dump — the
+> live API is now auth-gated), and **Städel** (`distractor/staedel`),
+> **Finna** (`distractor/finna`) and **SMB Berlin** (`distractor/smb`) join
+> SMK/NASA/Wellcome in the CI workflow matrix.
+>
+> **Migros Museum für Gegenwartskunst (Zürich), verified:** ~1,300 works
+> online as plain web pages (MuseumPlus-backed), no API or open data, and a
+> contemporary collection that is almost entirely in copyright; the
+> "library" is a shop of printed exhibition catalogues, not a digitized
+> archive. Label-only — nothing buildable.
 
 > Prefer to wander? The same research hangs as an exhibition in
 > [`research.html`](research.html) — *The Museum of Possible Museums* — every
