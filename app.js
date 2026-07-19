@@ -34,7 +34,7 @@
 
   async function getShard(n) {
     if (!shardCache.has(n)) {
-      shardCache.set(n, await fetchJSON(`data/shard-${n}.json`));
+      shardCache.set(n, await fetchJSON(`../data/shard-${n}.json`));
     }
     return shardCache.get(n);
   }
@@ -190,7 +190,7 @@
   });
 
   (async function init() {
-    meta = await fetchJSON('data/meta.json');
+    meta = await fetchJSON('../data/meta.json');
     let record = null;
     const idParam = params.get('id');
     if (idParam && /^\d+$/.test(idParam)) {
