@@ -54,10 +54,25 @@ python3 -m http.server 8000 -d public
 
 ### GitHub Pages
 
-`.github/workflows/pages.yml` builds the dataset and force-pushes `public/`
-as a single orphan commit to the `gh-pages` branch on every push to `main`.
-The site is served at <https://schaferjart.github.io/ShowMeMo/>. To refresh
-the dataset, re-run the workflow from the Actions tab (`workflow_dispatch`).
+`.github/workflows/pages.yml` builds the dataset and publishes `public/` to the
+**root** of the `gh-pages` branch on every push to `main`, leaving the sibling
+Distractors' subfolders in place. The site is served at
+<https://schaferjart.github.io/ShowMeMo/>. To refresh the dataset, re-run the
+workflow from the Actions tab (`workflow_dispatch`).
+
+`gh-pages` is a shared tree: the root is this site, and each sibling Distractor
+owns one subfolder (`/cleveland/`, `/artic/`, `/3d/`, `/hpbda/`, ...). Two rules
+keep that from breaking:
+
+- **One deploy target per workflow file.** A branch needing its own deploy adds
+  a new filename (`deploy-hpbda.yml`), never a second copy of `pages.yml` —
+  otherwise merging that branch overwrites this workflow's trigger.
+- **No deploy step wipes what it does not own.** The root deploy deletes only
+  top-level files and `data/`; subfolder deploys touch only their subfolder.
+
+Branches whose data source needs open egress (SMK, NASA, Wellcome, Städel,
+Finna, SMB) are built and deployed by `build-distractors.yml`, which checks each
+one out by ref and runs serially so the pushes to `gh-pages` cannot race.
 
 ### Docker / Coolify
 
