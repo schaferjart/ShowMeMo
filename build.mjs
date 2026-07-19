@@ -1,55 +1,89 @@
-// Downloads MoMA's Artworks.csv, filters to works with images, and shards the
-// records into small JSON files under public/data/.
+// Builds public/data/ from Smithsonian Open Access metadata dumps
+// (line-delimited JSON in the public smithsonian-open-access S3 bucket):
+// downloads the files for the art museums' units, keeps CC0 records whose
+// primary online media is an image, and shards the records.
 //
-// Sharding is by `ObjectID % shardCount`, so a permalink lookup needs only
-// meta.json plus a single shard — no index file.
+// Units: SAAM (American Art), NPG (Portrait Gallery), FS (Asian Art),
+// HMSG (Hirshhorn), NMAfA (African Art).
+//
+// Images are hotlinked from ids.si.edu at a 1000px bound; ObjectID is the
+// record's index in the snapshot, so permalinks are best-effort across
+// rebuilds.
 
-import { parse } from 'csv-parse';
-import { Readable } from 'node:stream';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-// The CSV lives in Git LFS; the plain raw.githubusercontent.com URL returns
-// only an LFS pointer file, so fetch the media URL instead.
-const CSV_URL =
-  'https://media.githubusercontent.com/media/MuseumofModernArt/collection/main/Artworks.csv';
-
+const BUCKET = 'https://smithsonian-open-access.s3.us-west-2.amazonaws.com';
+const UNITS = ['saam', 'npg', 'fs', 'hmsg', 'nmafa'];
+const UNIT_NAMES = {
+  SAAM: 'Smithsonian American Art Museum',
+  NPG: 'National Portrait Gallery',
+  FS: 'National Museum of Asian Art',
+  HMSG: 'Hirshhorn Museum and Sculpture Garden',
+  NMAFA: 'National Museum of African Art',
+};
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
 const TARGET_SHARD_BYTES = 40_000; // headroom under the ~50 KB ceiling
+const CONCURRENCY = 12;
 
-console.error(`Downloading ${CSV_URL} ...`);
-const res = await fetch(CSV_URL);
-if (!res.ok) {
-  throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
+const files = [];
+for (const unit of UNITS) {
+  const res = await fetch(`${BUCKET}/metadata/edan/${unit}/index.txt`);
+  if (!res.ok) throw new Error(`Index failed for ${unit}: HTTP ${res.status}`);
+  const urls = (await res.text()).trim().split('\n').filter(Boolean);
+  files.push(...urls);
+  console.error(`${unit}: ${urls.length} files`);
 }
 
-// Stream straight into the CSV parser. The file starts with a UTF-8 BOM and
-// fields contain quoted commas and escaped quotes; csv-parse handles all that.
-const parser = Readable.fromWeb(res.body).pipe(
-  parse({ bom: true, columns: true, relax_column_count: true })
-);
+const first = (list) => (list ?? [])[0]?.content ?? '';
 
 const works = [];
 let total = 0;
-for await (const row of parser) {
-  total++;
-  const imageURL = (row.ImageURL ?? '').trim();
-  if (!imageURL) continue;
-  const objectID = Number(row.ObjectID);
-  if (!Number.isInteger(objectID) || objectID < 0) continue;
-  const record = {
-    ObjectID: objectID,
-    Title: (row.Title ?? '').trim(),
-    Artist: (row.Artist ?? '').trim(),
-    Date: (row.Date ?? '').trim(),
-    Medium: (row.Medium ?? '').trim(),
-    CreditLine: (row.CreditLine ?? '').trim(),
-    URL: (row.URL ?? '').trim(),
-    ImageURL: imageURL,
-  };
-  if ((row.OnView ?? '').trim()) record.OnView = 1;
-  works.push(record);
+let done = 0;
+async function worker() {
+  for (;;) {
+    const url = files.shift();
+    if (!url) return;
+    // index.txt uses the legacy s3-us-west-2 host; normalize to the bucket URL.
+    const path = url.replace(/^https?:\/\/[^/]+\//, '');
+    const res = await fetch(`${BUCKET}/${path}`);
+    if (!res.ok) continue;
+    for (const line of (await res.text()).trim().split('\n')) {
+      if (!line) continue;
+      total++;
+      let row;
+      try {
+        row = JSON.parse(line);
+      } catch {
+        continue;
+      }
+      const dn = row.content?.descriptiveNonRepeating;
+      if (dn?.metadata_usage?.access !== 'CC0') continue;
+      const media = (dn.online_media?.media ?? []).find(
+        (m) => m.type === 'Images' && m.content && m.usage?.access === 'CC0'
+      );
+      if (!media) continue;
+      const ft = row.content?.freetext ?? {};
+      works.push({
+        Title: (dn.title?.content ?? '').trim(),
+        Artist: first(ft.name).trim(),
+        Date: first(ft.date).trim(),
+        Medium: first(ft.physicalDescription).trim(),
+        CreditLine: [first(ft.creditLine).trim(), UNIT_NAMES[row.unitCode] ?? row.unitCode]
+          .filter(Boolean)
+          .join(' — '),
+        URL: (dn.record_link || dn.guid || '').trim(),
+        ImageURL: `${media.content}&max=1000`,
+      });
+    }
+    if (++done % 100 === 0) console.error(`  ${done} files, ${works.length} works ...`);
+  }
 }
+await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+
+// Deterministic order for a given snapshot, then index as ObjectID.
+works.sort((a, b) => (a.URL < b.URL ? -1 : a.URL > b.URL ? 1 : 0));
+works.forEach((w, i) => (w.ObjectID = i));
 
 const totalBytes = works.reduce((sum, w) => sum + JSON.stringify(w).length + 1, 0);
 const shardCount = Math.max(1, Math.ceil(totalBytes / TARGET_SHARD_BYTES));
@@ -76,4 +110,4 @@ const largest = Math.max(...shards.map((s) => JSON.stringify(s).length));
 console.error(
   `Parsed ${total} records; wrote ${shardCount} shards (largest ${(largest / 1024).toFixed(1)} KB).`
 );
-console.log(`${works.length} works with images.`);
+console.log(`${works.length} CC0 works with images.`);
