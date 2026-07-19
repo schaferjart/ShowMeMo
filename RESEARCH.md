@@ -9,10 +9,16 @@ verified July 2026.
 > [Chicago](https://schaferjart.github.io/ShowMeMo/artic/) (`distractor/artic`) ·
 > [Washington](https://schaferjart.github.io/ShowMeMo/nga/) (`distractor/nga`) ·
 > [Minneapolis](https://schaferjart.github.io/ShowMeMo/mia/) (`distractor/mia`) ·
-> [Smithsonian 3D](https://schaferjart.github.io/ShowMeMo/3d/) (`distractor/si3d`).
-> The blocked-from-this-environment candidates (SMK, NASA, Wellcome, Paris
-> Musées) remain buildable elsewhere — their sources are open, only this
-> sandbox's egress couldn't reach them.
+> [Smithsonian 3D](https://schaferjart.github.io/ShowMeMo/3d/) (`distractor/si3d`) ·
+> [Baltimore/Walters](https://schaferjart.github.io/ShowMeMo/walters/) (`distractor/walters`) ·
+> [NYPL](https://schaferjart.github.io/ShowMeMo/nypl/) (`distractor/nypl`) ·
+> [Smithsonian 2D](https://schaferjart.github.io/ShowMeMo/smithsonian/) (`distractor/smithsonian`).
+> Three more — **SMK** (`distractor/smk`), **NASA** (`distractor/nasa`), and
+> **Wellcome** (`distractor/wellcome`) — ship complete build scripts but their
+> APIs are unreachable from this sandbox; the `build-distractors` GitHub
+> Actions workflow (see the PR from `claude/build-distractors-workflow`)
+> builds them on GitHub's runners and deploys `/smk/`, `/nasa/`,
+> `/wellcome/`. Paris Musées still needs a self-service account token.
 
 > Prefer to wander? The same research hangs as an exhibition in
 > [`research.html`](research.html) — *The Museum of Possible Museums* — every
