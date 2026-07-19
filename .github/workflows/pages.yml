@@ -3,9 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
-      - claude/distractor-moma-site-au9j42
-  # Re-run manually any time to refresh the dataset.
+      - hpbda
   workflow_dispatch:
 
 permissions:
@@ -20,26 +18,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: npm ci
-      - run: npm run build
-      # Publish public/ as the ROOT of gh-pages while preserving the
-      # Distractor fleet's subfolders (/museum/, /cleveland/, /3d/, ...),
-      # which are deployed there by their own branches and workflows.
+      # Publish public/ into the hpbda/ subfolder of gh-pages, leaving the
+      # root site and the rest of the Distractor fleet untouched. The page
+      # reads the artwork dataset from the root deploy's /data/, so no build
+      # step is needed here.
       - name: Publish to gh-pages
         run: |
           git fetch --depth 1 origin gh-pages
           git worktree add ../pages origin/gh-pages
           cd ../pages
-          # NB: .git is a *file* in a linked worktree — deleting it breaks git
-          find . -maxdepth 1 -type f ! -name '.git' ! -name '.nojekyll' ! -name '.gitignore' -delete
-          rm -rf data
-          cp -r "$GITHUB_WORKSPACE/public/." .
-          touch .nojekyll
+          rm -rf hpbda
+          mkdir hpbda
+          cp -r "$GITHUB_WORKSPACE/public/." hpbda/
+          rm -rf hpbda/data
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Deploy site from $GITHUB_SHA" || echo "No changes"
+          git commit -m "Deploy hpbda from $GITHUB_SHA" || echo "No changes"
           git push origin HEAD:gh-pages
