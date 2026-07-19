@@ -16,7 +16,9 @@
 
   const params = new URLSearchParams(location.search);
   const onViewOnly = params.get('onview') === '1';
-  const MAX_LAYERS = 6;
+  // Deep enough to feel unlimited; bounded so hours of browsing can't pile up
+  // hundreds of decoded JPEGs on low-memory devices.
+  const MAX_LAYERS = 30;
 
   let meta = null;
   let preloaded = null; // { record, image } fetched ahead of time
