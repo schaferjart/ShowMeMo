@@ -10,7 +10,7 @@
 </head>
 <body>
 <main>
-  <img id="artwork" alt="" decoding="async">
+  <div id="stage"></div>
 </main>
 
 <div class="controls">
@@ -20,23 +20,29 @@
       <path d="M20 4v5h-5"/>
     </svg>
   </button>
-  <button id="toggle-caption" type="button" aria-label="Toggle caption" aria-expanded="false" title="Caption (I)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-      <path d="M12 5v14M5 12h14"/>
+  <button id="download" type="button" aria-label="Download image" title="Download image">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>
     </svg>
   </button>
 </div>
 
-<aside id="caption" hidden>
-  <p id="cap-title"></p>
-  <p id="cap-artist"></p>
-  <p id="cap-date"></p>
-  <p id="cap-medium"></p>
-  <p id="cap-credit"></p>
-  <p><a id="cap-link" href="" target="_blank" rel="noopener">View at SMB recherche</a></p>
-</aside>
-
-<footer>A random work from the Staatliche Museen zu Berlin // J. A. Schafer 2026</footer>
+<div id="bottom">
+  <aside id="caption">
+    <button id="cap-summary" type="button" aria-expanded="false" aria-controls="cap-details" title="More about this work (I)">
+      <em id="cap-title"></em><span id="cap-meta"></span>
+    </button>
+    <div id="cap-details" hidden>
+      <p id="cap-medium"></p>
+      <p id="cap-credit"></p>
+      <p class="cap-row">
+        <a id="cap-link" href="" target="_blank" rel="noopener">View at SMB recherche</a>
+        <button id="cap-close" type="button" aria-label="Close details">&times;</button>
+      </p>
+    </div>
+  </aside>
+  <footer>A random work from the Staatliche Museen zu Berlin // J. A. Schafer 2026</footer>
+</div>
 
 <noscript><p class="noscript">This page needs JavaScript to pick a random artwork.</p></noscript>
 
