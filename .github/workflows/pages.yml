@@ -25,9 +25,6 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run build
-      # Publish public/ as a single orphan commit on gh-pages. Creating the
-      # gh-pages branch auto-enables Pages, and the orphan commit keeps the
-      # ~36 MB dataset from accumulating history.
       # Publish public/ as the ROOT of gh-pages while preserving the
       # Distractor fleet's subfolders (/museum/, /cleveland/, /3d/, ...),
       # which are deployed there by their own branches and workflows.
@@ -36,7 +33,8 @@ jobs:
           git fetch --depth 1 origin gh-pages
           git worktree add ../pages origin/gh-pages
           cd ../pages
-          find . -maxdepth 1 -type f ! -name '.nojekyll' ! -name '.gitignore' -delete
+          # NB: .git is a *file* in a linked worktree — deleting it breaks git
+          find . -maxdepth 1 -type f ! -name '.git' ! -name '.nojekyll' ! -name '.gitignore' -delete
           rm -rf data
           cp -r "$GITHUB_WORKSPACE/public/." .
           touch .nojekyll
