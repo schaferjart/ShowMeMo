@@ -1,19 +1,20 @@
-// Downloads MoMA's Artworks.csv, filters to works with images, and shards the
-// records into small JSON files under public/data/.
+// Builds public/data/ from the Fitzwilliam Museum's CC0 raw-data dump
+// (https://github.com/FitzwilliamMuseum/fitz-collection-raw-data): downloads
+// the master objects.csv.gz, keeps records with an image URL, and shards
+// the records into small JSON files.
 //
-// Sharding is by `ObjectID % shardCount`, so a permalink lookup needs only
-// meta.json plus a single shard — no index file.
+// The museum's live API is auth-gated; the GitHub dump is the sanctioned
+// open channel. Object ids are numeric ("object-1000"), so ObjectID keeps
+// the familiar `% shardCount` permalinks.
 
 import { parse } from 'csv-parse';
 import { Readable } from 'node:stream';
+import { createGunzip } from 'node:zlib';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-// The CSV lives in Git LFS; the plain raw.githubusercontent.com URL returns
-// only an LFS pointer file, so fetch the media URL instead.
 const CSV_URL =
-  'https://media.githubusercontent.com/media/MuseumofModernArt/collection/main/Artworks.csv';
-
+  'https://raw.githubusercontent.com/FitzwilliamMuseum/fitz-collection-raw-data/main/csv/objects.csv.gz';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
 const TARGET_SHARD_BYTES = 40_000; // headroom under the ~50 KB ceiling
 
@@ -23,32 +24,29 @@ if (!res.ok) {
   throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
 }
 
-// Stream straight into the CSV parser. The file starts with a UTF-8 BOM and
-// fields contain quoted commas and escaped quotes; csv-parse handles all that.
-const parser = Readable.fromWeb(res.body).pipe(
-  parse({ bom: true, columns: true, relax_column_count: true })
-);
+const parser = Readable.fromWeb(res.body)
+  .pipe(createGunzip())
+  .pipe(parse({ bom: true, columns: true, relax_column_count: true }));
 
 const works = [];
 let total = 0;
 for await (const row of parser) {
   total++;
-  const imageURL = (row.ImageURL ?? '').trim();
+  const imageURL = (row.largeImage ?? '').trim() || (row.thumbnail ?? '').trim();
   if (!imageURL) continue;
-  const objectID = Number(row.ObjectID);
+  const objectID = Number((row.id ?? '').replace(/^object-/, ''));
   if (!Number.isInteger(objectID) || objectID < 0) continue;
-  const record = {
+  const dates = [row.fromDate, row.toDate].map((d) => (d ?? '').trim()).filter(Boolean);
+  works.push({
     ObjectID: objectID,
-    Title: (row.Title ?? '').trim(),
-    Artist: (row.Artist ?? '').trim(),
-    Date: (row.Date ?? '').trim(),
-    Medium: (row.Medium ?? '').trim(),
-    CreditLine: (row.CreditLine ?? '').trim(),
-    URL: (row.URL ?? '').trim(),
+    Title: (row.title ?? '').trim(),
+    Artist: (row.maker ?? '').trim(),
+    Date: (row.period ?? '').trim() || (dates[0] === dates[1] ? dates[0] : dates.join('–')) || '',
+    Medium: (row.primaryCategory ?? '').trim(),
+    CreditLine: `The Fitzwilliam Museum, Cambridge — ${(row.department ?? '').trim()}`,
+    URL: (row.URI ?? '').trim(),
     ImageURL: imageURL,
-  };
-  if ((row.OnView ?? '').trim()) record.OnView = 1;
-  works.push(record);
+  });
 }
 
 const totalBytes = works.reduce((sum, w) => sum + JSON.stringify(w).length + 1, 0);
@@ -74,6 +72,6 @@ await writeFile(`${OUT_DIR}meta.json`, JSON.stringify(meta));
 
 const largest = Math.max(...shards.map((s) => JSON.stringify(s).length));
 console.error(
-  `Parsed ${total} records; wrote ${shardCount} shards (largest ${(largest / 1024).toFixed(1)} KB).`
+  `Parsed ${total} objects; wrote ${shardCount} shards (largest ${(largest / 1024).toFixed(1)} KB).`
 );
 console.log(`${works.length} works with images.`);
