@@ -1,4 +1,4 @@
-# Distractor: MoMA
+# Merci: MoMA
 
 A single-serving site in the spirit of James Bridle's
 [The Distractor](https://distractor.jamesbridle.com/) (2023): one random artwork
