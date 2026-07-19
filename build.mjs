@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 const API = 'https://api.wellcomecollection.org/catalogue/v2/images';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
 const TARGET_SHARD_BYTES = 40_000; // headroom under the ~50 KB ceiling
-const LICENSES = { 'cc0': 'CC0', 'pdm': 'Public Domain Mark' };
+const LICENSES = { 'cc-0': 'CC0', 'pdm': 'Public Domain Mark' };
 
 const byId = new Map();
 for (const [license, licenseName] of Object.entries(LICENSES)) {
