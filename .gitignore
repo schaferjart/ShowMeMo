@@ -1,2 +1,5 @@
 node_modules/
-public/data/
+dist/
+sites/*/public/data/
+.claude/skills/
+.claude/settings.local.json

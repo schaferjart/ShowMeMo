@@ -177,7 +177,7 @@
       const blobURL = URL.createObjectURL(await res.blob());
       const a = document.createElement('a');
       a.href = blobURL;
-      a.download = `moma-${current.ObjectID}.jpg`;
+      a.download = `${window.SITE?.slug || 'art'}-${current.ObjectID}.jpg`;
       a.click();
       if (window.posthog) {
         posthog.capture('artwork_downloaded', {

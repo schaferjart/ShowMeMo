@@ -1,0 +1,81 @@
+# Deploys the whole Distractor fleet: one job per site, each building its
+# dataset fresh and publishing into its own gh-pages/<slug>/ subfolder.
+#
+# One deploy target per folder; the root site (MoMA, on main) and /hpbda/ are
+# deployed by their own branches and are never touched here.
+
+name: Deploy fleet
+
+on:
+  push:
+    branches: [fleet]
+    paths:
+      - 'sites/**'
+      - 'shared/**'
+      - 'build-site.mjs'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 1 * *'   # monthly: refresh every dataset
+
+permissions:
+  contents: write
+
+# Shared with the root (pages) and /hpbda/ deploys so no two runs push to
+# gh-pages at once.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      # Jobs push to gh-pages serially — one worktree/commit/push at a time.
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        site:
+          - cleveland
+          - artic
+          - nga
+          - mia
+          - walters
+          - nypl
+          - smithsonian
+          - fitzwilliam
+          - smk
+          - nasa
+          - wellcome
+          - staedel
+          - finna
+          - smb
+          - museum
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fleet
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build the site
+        run: |
+          npm ci
+          node build-site.mjs ${{ matrix.site }}
+          test -f "dist/${{ matrix.site }}/index.html"
+
+      - name: Deploy to gh-pages/${{ matrix.site }}
+        run: |
+          git fetch --depth 1 origin gh-pages
+          git worktree add ../pages origin/gh-pages
+          rm -rf "../pages/${{ matrix.site }}"
+          mkdir -p "../pages/${{ matrix.site }}"
+          cp -r "dist/${{ matrix.site }}/." "../pages/${{ matrix.site }}/"
+          cd ../pages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${{ matrix.site }}"
+          git commit -m "Deploy /${{ matrix.site }}/ from fleet ($GITHUB_SHA)" || echo "No changes"
+          git push origin HEAD:gh-pages
