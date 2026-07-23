@@ -44,7 +44,8 @@ jobs:
           - smk
           - nasa
           - wellcome
-          - staedel
+          # staedel omitted: its OAI feed now returns metadata-less records
+          # (nothing to harvest). Source kept in sites/staedel/ to revisit.
           - finna
           - smb
           - museum
