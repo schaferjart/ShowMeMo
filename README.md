@@ -17,7 +17,6 @@ full screen, with almost no interface.
   work on screen.
 - `?onview=1` restricts the random picks to works currently on view at MoMA.
 
-That's it. The restraint is the product.
 
 ## How it works
 
