@@ -71,10 +71,10 @@ Each site carries a `config.json`:
 {
   "slug": "cleveland",
   "museum": "Cleveland Museum of Art",
-  "title": "Distractor: Cleveland",
-  "description": "One random CC0 work from the Cleveland Museum of Art.",
+  "title": "Serendipitous Cleveland",
+  "description": "Serendipitous Cleveland",
   "viewLabel": "View at the Cleveland Museum of Art",
-  "footer": "A random work from the Cleveland Museum of Art // J. A. Schafer 2026"
+  "footer": "Random work from the Cleveland Museum of Art // Inspired by JB // JS 2026"
 }
 ```
 
@@ -202,3 +202,23 @@ record's `URL` field.
 - Reverse-proxying PostHog.
 - The stale inert `pages.yml` on `distractor/smb` — moot once the branch is
   archived and deleted.
+
+
+## Amendments (from review, 2026-07-23)
+
+These override the body above where they conflict.
+
+**A1 — "Serendipitous" branding for every fleet site.** `title` and
+`description` follow `Serendipitous <Place>` (e.g. `Serendipitous Cleveland`).
+`footer` follows `Random work from <Museum> // Inspired by JB // JS 2026`.
+`viewLabel` stays museum-specific (`View at the Cleveland Museum of Art`).
+
+**A2 — 3D is its own branch, not a fleet folder.** Smithsonian 3D (`si3d`) is a
+different medium (rotatable objects, not flat images) and is handled
+separately. Create a branch **`3D`** from `distractor/si3d`, leave it
+standalone like `hpbda`; it keeps deploying to `/3d/`. It is removed from the
+fleet slug table and the `sites/*` set.
+
+Net effect: **fleet = 14 sites** (cleveland, artic, nga, mia, walters, nypl,
+smithsonian, fitzwilliam, smk, nasa, wellcome, staedel, finna, smb). **Four
+branches survive:** `main`, `hpbda`, `fleet`, `3D`.
