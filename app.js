@@ -119,6 +119,17 @@
     capLink.hidden = !record.URL;
     if (record.URL) capLink.href = record.URL;
 
+    if (window.posthog) {
+      posthog.capture('artwork_viewed', {
+        object_id: record.ObjectID,
+        title: record.Title || 'Untitled',
+        artist: record.Artist,
+        date: record.Date,
+        on_view: !!record.OnView,
+        onview_filter: onViewOnly,
+      });
+    }
+
     const url = new URL(location);
     url.searchParams.set('id', record.ObjectID);
     history.replaceState(null, '', url);
@@ -147,6 +158,13 @@
     capDetails.hidden = !open;
     caption.classList.toggle('open', open);
     capSummary.setAttribute('aria-expanded', String(open));
+    if (open && window.posthog) {
+      posthog.capture('artwork_info_opened', {
+        object_id: current?.ObjectID,
+        title: current?.Title || 'Untitled',
+        artist: current?.Artist,
+      });
+    }
   }
 
   let downloading = false;
@@ -161,6 +179,13 @@
       a.href = blobURL;
       a.download = `moma-${current.ObjectID}.jpg`;
       a.click();
+      if (window.posthog) {
+        posthog.capture('artwork_downloaded', {
+          object_id: current.ObjectID,
+          title: current.Title || 'Untitled',
+          artist: current.Artist,
+        });
+      }
       setTimeout(() => URL.revokeObjectURL(blobURL), 10000);
     } catch {
       open(current.ImageURL, '_blank', 'noopener');
@@ -169,18 +194,31 @@
     }
   }
 
-  refreshBtn.addEventListener('click', next);
+  refreshBtn.addEventListener('click', () => {
+    if (window.posthog) posthog.capture('artwork_refreshed', { source: 'button' });
+    next();
+  });
   downloadBtn.addEventListener('click', downloadImage);
   capSummary.addEventListener('click', () => {
     if (capDetails.hidden) setDetailsOpen(true);
   });
   capClose.addEventListener('click', () => setDetailsOpen(false));
+  capLink.addEventListener('click', () => {
+    if (window.posthog) {
+      posthog.capture('artwork_moma_link_clicked', {
+        object_id: current?.ObjectID,
+        title: current?.Title || 'Untitled',
+        artist: current?.Artist,
+      });
+    }
+  });
 
   addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const key = e.key.toLowerCase();
     if (key === ' ' || key === 'r') {
       e.preventDefault();
+      if (window.posthog) posthog.capture('artwork_refreshed', { source: 'keyboard', key: key === ' ' ? 'space' : 'r' });
       next();
     } else if (key === 'i') {
       setDetailsOpen(capDetails.hidden);
@@ -190,7 +228,12 @@
   });
 
   (async function init() {
-    meta = await fetchJSON('data/meta.json');
+    try {
+      meta = await fetchJSON('data/meta.json');
+    } catch (err) {
+      if (window.posthog) posthog.captureException(err, { additional_properties: { context: 'meta_load' } });
+      throw err;
+    }
     let record = null;
     const idParam = params.get('id');
     if (idParam && /^\d+$/.test(idParam)) {
