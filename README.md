@@ -1,4 +1,4 @@
-# Distractor: MoMA
+# Serendipity Machine: MoMA
 
 A single-serving site in the spirit of James Bridle's
 [The Distractor](https://distractor.jamesbridle.com/) (2023): one random artwork
@@ -66,8 +66,8 @@ long cache headers for `/data/` and static assets, and no caching for
 `index.html`.
 
 ```sh
-docker build -t distractor-moma .
-docker run -p 8080:80 distractor-moma
+docker build -t serendipity-machine .
+docker run -p 8080:80 serendipity-machine
 ```
 
 On Coolify: create an application from this repository with the Dockerfile
