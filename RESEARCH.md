@@ -1,10 +1,10 @@
-# Database options for new Distractors
+# Database options for new Serendipity Machines
 
-Research into open datasets that could power sibling sites to Distractor: MoMA,
+Research into open datasets that could power sibling sites to Serendipity Machine: MoMA,
 verified July 2026.
 
 > **Now on view** — five of these datasets are no longer hypothetical; working
-> Distractors are deployed from their own branches:
+> Serendipity Machines are deployed from their own branches:
 > [Cleveland](https://schaferjart.github.io/ShowMeMo/cleveland/) (`distractor/cleveland`) ·
 > [Chicago](https://schaferjart.github.io/ShowMeMo/artic/) (`distractor/artic`) ·
 > [Washington](https://schaferjart.github.io/ShowMeMo/nga/) (`distractor/nga`) ·
@@ -36,7 +36,7 @@ verified July 2026.
 > Prefer to wander? The same research hangs as an exhibition in
 > [`research.html`](research.html) — *The Museum of Possible Museums* — every
 > dataset as a wall label, sorted into rooms, with a Space/R shuffle like the
-> Distractor itself. Open it in any browser; this file remains the catalogue
+> Serendipity Machine itself. Open it in any browser; this file remains the catalogue
 > of record with full details and sources.
 
 ## What the current build needs from a dataset
@@ -103,7 +103,7 @@ Everything below is sorted by how well it meets those three.
 - **Historic England Archive** — listing *data* is open, but the photographs are a paid licensing service.
 - **Cover Art Archive / ArchDaily / editorial sites** — in-copyright imagery.
 
-## 3D objects — Distractor in three dimensions
+## 3D objects — Serendipity Machine in three dimensions
 
 Extending the idea from a random *image* to a random *3D object* is viable, and
 one source stands far above the rest.
@@ -220,7 +220,7 @@ Commons is the de-facto open channel for their public-domain works.
 - **Deutsche Digitale Bibliothek** — ~50M-record German aggregator, free self-service API key, per-record license facet; but images are heterogeneous (small DDB previews vs. provider-hosted originals of varying reliability).
 - **MDZ / Bayerische Staatsbibliothek** — ~3.2M items over keyless IIIF at massive scale, mostly Public Domain Mark; content is books/manuscripts/maps, so best as a supplement (illuminated manuscripts, prints).
 - **Bodleian (Oxford)** — excellent keyless IIIF + JSON data API; images mostly **CC BY-NC**.
-- **Fitzwilliam (Cambridge)** — ~267k objects, keyless paged JSON API, CC0 metadata, direct JPEGs; images are per-record and lean CC BY-NC-ND — displayable verbatim with credit (which is all a Distractor does), but check the rights field.
+- **Fitzwilliam (Cambridge)** — ~267k objects, keyless paged JSON API, CC0 metadata, direct JPEGs; images are per-record and lean CC BY-NC-ND — displayable verbatim with credit (which is all a Serendipity Machine does), but check the rights field.
 - **Museum Data Service (museumdata.uk)** — new UK aggregator (launched Sept 2024, ~3M records from 21 museums, targeting 100M); free API tokens, per-museum licensing, uneven image coverage. Watchlist rather than build target.
 - **British Library** — its own data services are still crippled by the October 2023 ransomware attack (metadata not restored as of 2026); but the **~1.07M public-domain "Mechanical Curator" book illustrations on Flickr Commons** are stable and hotlinkable (Flickr API key needed to harvest).
 - **Natural History Museum London** — best-in-class open data (keyless CKAN API, CC0 data, CC BY images, 5M+ records) — specimens rather than artworks, but a great fit if the concept stretches to natural history.
@@ -305,19 +305,19 @@ URLs are time-limited signed URLs — breaks static hotlinking), **Denmark FBB**
 
 ## Recommendations
 
-Ranked by effort-to-payoff for a sibling Distractor:
+Ranked by effort-to-payoff for a sibling Serendipity Machine:
 
 1. **Cleveland Museum of Art** — image URLs are already in a single CSV/JSON dump; closest to a find-and-replace on the current `build.mjs`.
 2. **Art Institute of Chicago** — JSONL dump + deterministic IIIF URLs; monthly auto-refresh.
 3. **LoC Sanborn maps** *(non-art)* — prebuilt CSV/JSON package, public domain, visually striking.
 4. **LoC HABS/HAER** *(architecture)* — keyless JSON API, public domain, rich captions; needs polite throttled harvesting at build time.
 5. **NASA Images** or **Wellcome** — keyless APIs with hotlinkable images for space and medical/scientific illustration flavors.
-6. **Wikidata → Commons** — the general-purpose engine if a future Distractor needs any theme (bridges, brutalism, lighthouses…) with structured captions.
+6. **Wikidata → Commons** — the general-purpose engine if a future Serendipity Machine needs any theme (bridges, brutalism, lighthouses…) with structured captions.
 7. **Smithsonian 3D via S3 + `<model-viewer>`** *(3D)* — ~2,360 CC0 packages, keyless enumeration, CORS-enabled hotlinkable GLBs; the only 3D source that fits the static pattern cleanly.
 8. **ETH via Wikimedia Commons or e-rara** *(ETH)* — the two ETH routes that are open, keyless, and bulk-harvestable today.
 9. **SMK Denmark** *(Europe)* — the European source that matches Cleveland/AIC friction levels: keyless API, CC0, image URLs in the response; **Paris Musées** and **Städel** follow close behind.
 10. For "a random Louvre/Prado/British Museum painting": those institutions are closed — go through **Wikimedia Commons/Wikidata** instead.
-11. **TU Berlin Architekturmuseum** *(architecture)* — ~92k public-domain architectural drawings as 3000px JPGs with CSV export: the architecture-drawing counterpart to Cleveland. Pair with **LoC HABS** (photos) and **Getty Shulman** (mid-century modern) for a full architecture Distractor family.
+11. **TU Berlin Architekturmuseum** *(architecture)* — ~92k public-domain architectural drawings as 3000px JPGs with CSV export: the architecture-drawing counterpart to Cleveland. Pair with **LoC HABS** (photos) and **Getty Shulman** (mid-century modern) for a full architecture Serendipity Machine family.
 
 A note on verification: dataset locations and rate limits above were verified
 against official docs and repos in July 2026, but a smoke test of the top

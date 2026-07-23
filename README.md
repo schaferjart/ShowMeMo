@@ -56,12 +56,12 @@ python3 -m http.server 8000 -d public
 
 `.github/workflows/pages.yml` builds the dataset and publishes `public/` to the
 **root** of the `gh-pages` branch on every push to `main`, leaving the sibling
-Distractors' subfolders in place. The site is served at
+Serendipity Machines' subfolders in place. The site is served at
 <https://schaferjart.github.io/ShowMeMo/>. To refresh the dataset, re-run the
 workflow from the Actions tab (`workflow_dispatch`).
 
-`gh-pages` is a shared tree: the root is this site, and each sibling Distractor
-owns one subfolder (`/cleveland/`, `/artic/`, `/3d/`, `/hpbda/`, ...). Two rules
+`gh-pages` is a shared tree: the root is this site, and each sibling Serendipity
+Machine owns one subfolder (`/cleveland/`, `/artic/`, `/3d/`, `/hpbda/`, ...). Two rules
 keep that from breaking:
 
 - **One deploy target per workflow file.** A branch needing its own deploy adds
@@ -82,8 +82,8 @@ long cache headers for `/data/` and static assets, and no caching for
 `index.html`.
 
 ```sh
-docker build -t distractor-moma .
-docker run -p 8080:80 distractor-moma
+docker build -t serendipity-machine .
+docker run -p 8080:80 serendipity-machine
 ```
 
 On Coolify: create an application from this repository with the Dockerfile
