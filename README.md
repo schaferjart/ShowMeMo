@@ -70,9 +70,9 @@ keep that from breaking:
 - **No deploy step wipes what it does not own.** The root deploy deletes only
   top-level files and `data/`; subfolder deploys touch only their subfolder.
 
-Branches whose data source needs open egress (SMK, NASA, Wellcome, Städel,
-Finna, SMB) are built and deployed by `build-distractors.yml`, which checks each
-one out by ref and runs serially so the pushes to `gh-pages` cannot race.
+The sibling Serendipity Machines live on the `fleet` branch (one folder per
+museum) and deploy themselves via that branch's `deploy.yml`; `hpbda` and the
+`3D` site deploy from their own branches. This root only publishes MoMA.
 
 ### Docker / Coolify
 
