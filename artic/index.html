@@ -3,14 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Distractor: Chicago</title>
-<meta name="description" content="One random public-domain work from the Art Institute of Chicago.">
+<title>Serendipitous Chicago</title>
+<meta name="description" content="Serendipitous Chicago">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
+<!-- PostHog analytics. The project token is a publishable client key (safe to
+     expose); this is a static site with no bundler, so it lives here inline. -->
+<script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Ji Yi init fn mn Hr pn bn cn capture calculateEventProperties Sn register register_once register_for_session unregister unregister_for_session Tn getFeatureFlag getFeatureFlagPayload getFeatureFlagResult getAllFeatureFlags isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync Mn identify setPersonProperties unsetPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset shutdown setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty Cn xn createPersonProfile setInternalOrTestUser In hn Pn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing debug Ur wt getPageViewId captureTraceFeedback captureTraceMetric an".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_zd5UCuwRojZtqfP9Y3GA48x562SBe5Ws9CyNEcjdaHhA', {
+        api_host: 'https://eu.i.posthog.com',
+        defaults: '2026-05-30',
+        person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+    });
+    // One project for the whole fleet; segment by these super properties.
+    posthog.register({ site: 'artic', museum: 'Art Institute of Chicago' });
+</script>
+<!-- Site identity for app.js (download filename); set even if PostHog is blocked. -->
+<script>
+    window.SITE = { slug: 'artic', museum: 'Art Institute of Chicago' };
+</script>
 </head>
 <body>
 <main>
-  <img id="artwork" alt="" decoding="async">
+  <div id="stage"></div>
 </main>
 
 <div class="controls">
@@ -20,26 +36,33 @@
       <path d="M20 4v5h-5"/>
     </svg>
   </button>
-  <button id="toggle-caption" type="button" aria-label="Toggle caption" aria-expanded="false" title="Caption (I)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-      <path d="M12 5v14M5 12h14"/>
+  <button id="download" type="button" aria-label="Download image" title="Download image">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>
     </svg>
   </button>
 </div>
 
-<aside id="caption" hidden>
-  <p id="cap-title"></p>
-  <p id="cap-artist"></p>
-  <p id="cap-date"></p>
-  <p id="cap-medium"></p>
-  <p id="cap-credit"></p>
-  <p><a id="cap-link" href="" target="_blank" rel="noopener">View at the Art Institute of Chicago</a></p>
-</aside>
-
-<footer>A random work from the Art Institute of Chicago // J. A. Schafer 2026</footer>
+<div id="bottom">
+  <aside id="caption">
+    <button id="cap-summary" type="button" aria-expanded="false" aria-controls="cap-details" title="More about this work (I)">
+      <em id="cap-title"></em><span id="cap-meta"></span>
+    </button>
+    <div id="cap-details" hidden>
+      <p id="cap-medium"></p>
+      <p id="cap-credit"></p>
+      <p class="cap-row">
+        <a id="cap-link" href="" target="_blank" rel="noopener">View at the Art Institute of Chicago</a>
+        <button id="cap-close" type="button" aria-label="Close details">&times;</button>
+      </p>
+    </div>
+  </aside>
+  <footer>Random work from the Art Institute of Chicago // Inspired by JB // JS 2026</footer>
+</div>
 
 <noscript><p class="noscript">This page needs JavaScript to pick a random artwork.</p></noscript>
 
+<script src="posthog.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
