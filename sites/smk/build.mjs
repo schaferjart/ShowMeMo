@@ -12,6 +12,7 @@
 
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { fetchText } from '../../fetch-retry.mjs';
 
 const API = 'https://api.smk.dk/api/v1/art/search/';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
@@ -23,9 +24,9 @@ let offset = 0;
 let found = Infinity;
 while (offset < found) {
   const url = `${API}?keys=*&filters=[has_image:true],[public_domain:true]&offset=${offset}&rows=${ROWS}`;
-  const res = await fetch(url);
+  const res = await fetchText(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} at offset ${offset}`);
-  const page = await res.json();
+  const page = JSON.parse(res.text);
   found = page.found ?? 0;
   for (const item of page.items ?? []) {
     const image = (item.image_native ?? item.image_max ?? '').toString().trim();

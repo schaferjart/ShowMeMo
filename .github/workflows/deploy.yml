@@ -1,8 +1,13 @@
-# Deploys the whole Distractor fleet: one job per site, each building its
-# dataset fresh and publishing into its own gh-pages/<slug>/ subfolder.
+# Deploys the whole Distractor fleet.
 #
-# One deploy target per folder; the root site (MoMA, on main) and /hpbda/ are
-# deployed by their own branches and are never touched here.
+# Build and deploy are split: every site builds in PARALLEL (no gh-pages
+# access, so nothing races), uploading its folder as an artifact. A single
+# deploy job then collects the artifacts and makes ONE commit to gh-pages.
+# Wall-clock is the slowest single build plus one push — not the sum of 15.
+#
+# The root site (MoMA, on main) and /hpbda/ are deployed by their own branches
+# and are never touched here. Sites whose build fails are simply skipped; their
+# existing gh-pages folder (if any) is left untouched.
 
 name: Deploy fleet
 
@@ -21,19 +26,11 @@ on:
 permissions:
   contents: write
 
-# Shared with the root (pages) and /hpbda/ deploys so no two runs push to
-# gh-pages at once.
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      # Jobs push to gh-pages serially — one worktree/commit/push at a time.
-      max-parallel: 1
-      fail-fast: false
+      fail-fast: false          # one flaky museum API must not sink the rest
       matrix:
         site:
           - cleveland
@@ -55,27 +52,50 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: fleet
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
+          cache: npm
       - name: Build the site
         run: |
           npm ci
           node build-site.mjs ${{ matrix.site }}
           test -f "dist/${{ matrix.site }}/index.html"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-${{ matrix.site }}
+          path: dist/${{ matrix.site }}
+          retention-days: 1
 
-      - name: Deploy to gh-pages/${{ matrix.site }}
+  deploy:
+    needs: build
+    if: always()                # publish whatever built, even if some sites failed
+    runs-on: ubuntu-latest
+    # Shared with the root (pages) and /hpbda/ deploys so no two runs push to
+    # gh-pages at once.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: site-*            # one dir per successful site: artifacts/site-<slug>/
+      - name: Publish to gh-pages
         run: |
-          git fetch --depth 1 origin gh-pages
-          git worktree add ../pages origin/gh-pages
-          rm -rf "../pages/${{ matrix.site }}"
-          mkdir -p "../pages/${{ matrix.site }}"
-          cp -r "dist/${{ matrix.site }}/." "../pages/${{ matrix.site }}/"
-          cd ../pages
+          git clone --depth 1 --branch gh-pages \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" pages
+          for dir in artifacts/site-*; do
+            [ -d "$dir" ] || continue
+            slug="${dir#artifacts/site-}"
+            rm -rf "pages/$slug"
+            mkdir -p "pages/$slug"
+            cp -r "$dir/." "pages/$slug/"
+            echo "staged /$slug/"
+          done
+          cd pages
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "${{ matrix.site }}"
-          git commit -m "Deploy /${{ matrix.site }}/ from fleet ($GITHUB_SHA)" || echo "No changes"
-          git push origin HEAD:gh-pages
+          git add -A
+          git commit -m "Deploy fleet from ${{ github.sha }}" || { echo "No changes"; exit 0; }
+          git push origin gh-pages

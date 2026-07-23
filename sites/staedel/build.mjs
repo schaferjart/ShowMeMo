@@ -14,6 +14,7 @@
 
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { fetchText } from '../../fetch-retry.mjs';
 
 const OAI = 'https://sammlung.staedelmuseum.de/api/oai';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
@@ -38,9 +39,9 @@ const grab = (xml, element) => {
 const works = [];
 let url = `${OAI}?verb=ListRecords&metadataPrefix=lido`;
 for (;;) {
-  const res = await fetch(url);
+  const res = await fetchText(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  const xml = await res.text();
+  const xml = res.text;
   const records = xml.split('<record>').slice(1);
   for (const record of records) {
     if (record.includes('status="deleted"')) continue;

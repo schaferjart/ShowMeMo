@@ -15,6 +15,7 @@
 
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { fetchText } from '../../fetch-retry.mjs';
 
 const API = 'https://api.wellcomecollection.org/catalogue/v2/images';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
@@ -24,10 +25,12 @@ const LICENSES = { 'cc-0': 'CC0', 'pdm': 'Public Domain Mark' };
 const byId = new Map();
 for (const [license, licenseName] of Object.entries(LICENSES)) {
   for (let page = 1; page <= 100; page++) {
-    const url = `${API}?locations.license=${license}&pageSize=100&page=${page}&include=source.contributors,source.production`;
-    const res = await fetch(url);
+    // The API dropped source.production (dates); source.contributors remains
+    // the only useful include here, so Date is left blank.
+    const url = `${API}?locations.license=${license}&pageSize=100&page=${page}&include=source.contributors`;
+    const res = await fetchText(url);
     if (!res.ok) break;
-    const body = await res.json();
+    const body = JSON.parse(res.text);
     for (const item of body.results ?? []) {
       if (!item.id || byId.has(item.id)) continue;
       // thumbnail.url is a IIIF info.json; rewrite it to a sized image.
@@ -38,14 +41,10 @@ for (const [license, licenseName] of Object.entries(LICENSES)) {
         .map((c) => c.agent?.label)
         .filter(Boolean)
         .join('; ');
-      const dates = (src.production ?? [])
-        .flatMap((p) => (p.dates ?? []).map((d) => d.label))
-        .filter(Boolean)
-        .join(', ');
       byId.set(item.id, {
         Title: (src.title ?? '').trim(),
         Artist: contributors,
-        Date: dates,
+        Date: '',
         Medium: '',
         CreditLine: `Wellcome Collection (${licenseName})`,
         URL: src.id ? `https://wellcomecollection.org/works/${src.id}/images?id=${item.id}` : '',
