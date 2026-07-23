@@ -1,8 +1,8 @@
-# Distractor: Smithsonian 3D
+# Serendipity Machine: Smithsonian 3D
 
 One random 3D object from [Smithsonian Open Access](https://3d.si.edu),
 full screen and spinnable, with almost no interface. A sibling of
-Distractor: MoMA (`main` branch) — same idea, one more dimension.
+Serendipity Machine: MoMA (`main` branch) — same idea, one more dimension.
 
 - `Space` / `R` for another object · `I` toggles the caption · drag to orbit · `?id=<n>` permalinks (best-effort across rebuilds).
 
