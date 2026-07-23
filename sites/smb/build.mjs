@@ -18,12 +18,13 @@ const API = 'https://api.smb.museum/search/';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
 const TARGET_SHARD_BYTES = 40_000; // headroom under the ~50 KB ceiling
 const LIMIT = 100;
+const MAX_OFFSET = 25000; // the API returns HTTP 500 past this deep-paging window
 
 const works = [];
 let offset = 0;
 let total = Infinity;
 let logged = false;
-while (offset < total) {
+while (offset < Math.min(total, MAX_OFFSET)) {
   const res = await fetchText(`${API}?lang=de&limit=${LIMIT}&offset=${offset}`, {
     method: 'POST',
     headers: {
@@ -59,6 +60,9 @@ while (offset < total) {
   }
   offset += LIMIT;
   if (offset % 5000 === 0) console.error(`  ${offset}/${total} ...`);
+}
+if (total > MAX_OFFSET) {
+  console.error(`  capped at ${MAX_OFFSET} of ${total} (API deep-paging limit)`);
 }
 
 if (works.length < 100) {
