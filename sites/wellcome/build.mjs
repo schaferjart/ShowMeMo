@@ -4,7 +4,7 @@
 // records.
 //
 // NOTE: api.wellcomecollection.org is not reachable from every sandboxed
-// environment; this branch is normally built by the build-distractors
+// environment; this site is normally built by the fleet deploy
 // GitHub Actions workflow.
 //
 // The API caps any single result set at 10,000 items, so the harvest runs

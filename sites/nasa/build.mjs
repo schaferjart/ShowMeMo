@@ -3,7 +3,7 @@
 // through the search API, dedupes by nasa_id, and shards the records.
 //
 // NOTE: images-api.nasa.gov is not reachable from every sandboxed
-// environment; this branch is normally built by the build-distractors
+// environment; this site is normally built by the fleet deploy
 // GitHub Actions workflow.
 //
 // ObjectID is the record's index in the snapshot, so permalinks are

@@ -3,7 +3,7 @@
 // search API for freely reusable images and shards the records.
 //
 // NOTE: api.finna.fi is not reachable from every sandboxed environment;
-// this branch is normally built by the build-distractors GitHub Actions
+// this site is normally built by the fleet deploy GitHub Actions
 // workflow.
 //
 // Deep paging is capped by the backend, so the harvest runs once per

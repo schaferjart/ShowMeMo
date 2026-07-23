@@ -7,7 +7,7 @@
 // direct images.nypl.org URLs (t=w requests the 760px web size).
 //
 // ObjectID is the NYPL databaseID, so `ObjectID % shardCount` permalinks
-// work exactly as in the other Distractors.
+// work exactly as in the other sites.
 //
 // Set NYPL_DIR to an existing clone to skip the ~500 MB clone.
 

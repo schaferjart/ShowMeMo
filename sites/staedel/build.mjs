@@ -4,7 +4,7 @@
 // linkResource, and shards the records.
 //
 // NOTE: sammlung.staedelmuseum.de is not reachable from every sandboxed
-// environment; this branch is normally built by the build-distractors
+// environment; this site is normally built by the fleet deploy
 // GitHub Actions workflow. The museum asks harvesters to register a name
 // and email as a courtesy.
 //

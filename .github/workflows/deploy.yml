@@ -1,4 +1,4 @@
-# Deploys the whole Distractor fleet.
+# Deploys the whole Serendipity Machine fleet.
 #
 # Build and deploy are split: every site builds in PARALLEL (no gh-pages
 # access, so nothing races), uploading its folder as an artifact. A single

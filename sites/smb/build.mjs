@@ -5,7 +5,7 @@
 // NOTE: api.smb.museum is public but undocumented — pin to the shapes the
 // museum's own frontend uses, log the first response, and fail loudly on
 // mismatch. The host is not reachable from every sandboxed environment;
-// this branch is normally built by the build-distractors workflow.
+// this site is normally built by the fleet deploy workflow.
 //
 // Image URLs are deterministic: recherche.smb.museum/images/{asset}_{size}.jpg
 // (the client falls back to another work if a rendition 404s).

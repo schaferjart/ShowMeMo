@@ -1,6 +1,6 @@
-# Distractor fleet
+# Serendipity Machine
 
-The sibling sites to MoMA's Distractor — one random artwork from a museum's open
+The sibling sites to MoMA's Serendipity Machine — one random artwork from a museum's open
 collection, full screen, almost no interface — one folder per museum, all built
 on the same shared app.
 

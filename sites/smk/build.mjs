@@ -4,7 +4,7 @@
 // records into small JSON files.
 //
 // NOTE: api.smk.dk is not reachable from every sandboxed environment; this
-// branch is normally built by the build-distractors GitHub Actions
+// site is normally built by the fleet deploy GitHub Actions
 // workflow, where the runner has open egress.
 //
 // ObjectID is the record's index in the snapshot (SMK object numbers are

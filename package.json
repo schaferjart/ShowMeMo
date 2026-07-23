@@ -1,9 +1,9 @@
 {
-  "name": "distractor-moma",
+  "name": "serendipity-machine",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "A single-serving site showing one random artwork from MoMA's collection.",
+  "description": "The Serendipity Machine fleet — one random artwork from each museum's open collection.",
   "scripts": {
     "build": "node build.mjs"
   },
