@@ -32,22 +32,52 @@ body {
 main {
   position: fixed;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: min(7vmin, 56px);
 }
 
-#artwork {
+#stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Recent works pile up beneath the current one: always straight, slightly
+   offset, dimmed, newest on top (DOM order = z order). */
+.work {
+  position: absolute;
+  inset: 0;
+  margin: auto;
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.35s ease, transform 0.4s ease;
 }
 
-#artwork.loaded {
+.work.loaded {
   opacity: 1;
+}
+
+.work.settled {
+  opacity: 0.55;
+  transform: translate(var(--dx, 0px), var(--dy, 0px));
+  box-shadow: 0 2px 18px rgba(0, 0, 0, 0.18);
+}
+
+.work.gone {
+  opacity: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .work.settled {
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work {
+    transition: none;
+  }
 }
 
 .controls {
@@ -75,50 +105,100 @@ main {
   display: block;
   width: 20px;
   height: 20px;
-  transition: transform 0.2s ease;
 }
 
-.controls button[aria-expanded="true"] svg {
-  transform: rotate(45deg);
+#bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 28px 16px 10px;
+  background: linear-gradient(to top, var(--bg) 65%, transparent);
 }
 
 #caption {
-  position: fixed;
-  left: 16px;
-  bottom: 44px;
-  max-width: min(42ch, calc(100vw - 32px));
-  padding: 14px 16px;
-  background: var(--panel);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  max-width: min(48ch, 100%);
   font-size: 13px;
 }
 
-#caption p {
-  margin: 0 0 4px;
+#cap-summary {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-#caption p:last-child {
-  margin-bottom: 0;
+#cap-summary:hover,
+#cap-summary:focus-visible,
+#caption.open #cap-summary {
+  opacity: 1;
 }
 
-#caption p:empty {
-  display: none;
+#caption.open #cap-summary {
+  white-space: normal;
+  cursor: default;
 }
 
 #cap-title {
   font-style: italic;
 }
 
-#caption a {
+#cap-details {
+  margin-top: 4px;
+}
+
+#cap-details p {
+  margin: 0 0 4px;
+}
+
+#cap-details p:last-child {
+  margin-bottom: 0;
+}
+
+#cap-details p:empty {
+  display: none;
+}
+
+#cap-details a {
   color: inherit;
 }
 
+.cap-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#cap-close {
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+#cap-close:hover,
+#cap-close:focus-visible {
+  opacity: 1;
+}
+
+/* A blank line's worth of space keeps the credit line distinct from the caption. */
 footer {
-  position: fixed;
-  bottom: 10px;
-  left: 0;
-  right: 0;
+  margin-top: 14px;
   text-align: center;
   font-size: 11px;
   opacity: 0.35;
