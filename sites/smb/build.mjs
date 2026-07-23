@@ -12,6 +12,7 @@
 
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { fetchText } from '../../fetch-retry.mjs';
 
 const API = 'https://api.smb.museum/search/';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
@@ -23,7 +24,7 @@ let offset = 0;
 let total = Infinity;
 let logged = false;
 while (offset < total) {
-  const res = await fetch(`${API}?lang=de&limit=${LIMIT}&offset=${offset}`, {
+  const res = await fetchText(`${API}?lang=de&limit=${LIMIT}&offset=${offset}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -34,7 +35,7 @@ while (offset < total) {
     }),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} at offset ${offset}`);
-  const body = await res.json();
+  const body = JSON.parse(res.text);
   if (!logged) {
     console.error('First response keys:', Object.keys(body).join(', '));
     console.error('First object:', JSON.stringify(body.objects?.[0]).slice(0, 600));

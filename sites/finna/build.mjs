@@ -12,6 +12,7 @@
 
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { fetchText } from '../../fetch-retry.mjs';
 
 const API = 'https://api.finna.fi/v1/search';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
@@ -29,9 +30,9 @@ for (const [usage, usageName] of Object.entries(USAGE)) {
     for (const f of ['id', 'title', 'nonPresenterAuthors', 'year', 'formats', 'buildings', 'imageRights', 'images']) {
       params.append('field[]', f);
     }
-    const res = await fetch(`${API}?${params}`);
+    const res = await fetchText(`${API}?${params}`);
     if (!res.ok) break;
-    const body = await res.json();
+    const body = JSON.parse(res.text);
     const records = body.records ?? [];
     if (!records.length) break;
     for (const r of records) {

@@ -11,6 +11,7 @@
 
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { fetchText } from '../../fetch-retry.mjs';
 
 const API = 'https://images-api.nasa.gov/search';
 const OUT_DIR = fileURLToPath(new URL('./public/data/', import.meta.url));
@@ -26,9 +27,9 @@ const byId = new Map();
 for (const q of QUERIES) {
   for (let page = 1; page <= MAX_PAGES; page++) {
     const url = `${API}?q=${encodeURIComponent(q)}&media_type=image&page_size=100&page=${page}`;
-    const res = await fetch(url);
+    const res = await fetchText(url);
     if (!res.ok) break; // past the last page the API returns 400
-    const items = (await res.json()).collection?.items ?? [];
+    const items = JSON.parse(res.text).collection?.items ?? [];
     if (!items.length) break;
     for (const item of items) {
       const data = item.data?.[0];
