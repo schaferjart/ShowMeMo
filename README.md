@@ -1,28 +1,29 @@
 # Serendipity Machine
 
-A single-serving site in the spirit of James Bridle's
+A site in the spirit of James Bridle's
 [The Distractor](https://distractor.jamesbridle.com/) (2023): one random artwork
-from [The Museum of Modern Art's collection dataset](https://github.com/MuseumofModernArt/collection),
-full screen, with almost no interface.
+from [The Museum of Modern Art's collection dataset](https://github.com/MuseumofModernArt/collection).
 
-- The artwork fills the viewport; the works you saw before remain beneath it,
-  neatly piled — straight, slightly offset, dimmed — growing as you browse
-  (a distant safety cap keeps very long sessions smooth).
+- The artwork fills the viewport; the works you saw before remain beneath it, neatly piled — straight, slightly offset, dimmed — growing as you browse.
 - The refresh button (or `Space` / `R`) loads another random work.
 - The download button saves the image.
-- Title, artist, and year are always visible at the bottom; clicking them
-  reveals medium, credit line, and a link to the work at MoMA
-  (the `×`, `Esc`, or `I` closes it again).
+- Title, artist, and year are always visible at the bottom; clicking them reveals medium, credit line, and a link to the work at MoMA (the `×`, `Esc`, or `I` closes it again).
 - `?id=<ObjectID>` permalinks to a specific work; the URL always reflects the
-  work on screen.
 - `?onview=1` restricts the random picks to works currently on view at MoMA.
+- Connect it to your browser and let every new tab be a pretty. 
 
+## Install to Brave (Chromium)
+
+The dropdown doesn't offer "custom URL" directly, but there's a workaround: The "Homepage" trick
+
+1. Go to Settings → Appearance
+2. Enable "Show home button"
+3. Select the custom URL field and paste your URL
+4. In "New tab page shows" → select "Homepage"
 
 ## How it works
 
-There is no backend and no framework. `build.mjs` downloads MoMA's
-`Artworks.csv` (~160,000 records, Git LFS), keeps the ~half that have an
-image URL, and shards them into small JSON files by `ObjectID % shardCount`.
+`build.mjs` downloads MoMA's `Artworks.csv` (~160,000 records, Git LFS), keeps the ~half that have an image URL, and shards them into small JSON files by `ObjectID % shardCount`.
 Because the shard for any ObjectID is computable, permalinks resolve with no
 index file. Per pageview the client fetches only `meta.json`, one shard
 (< 50 KB), and one JPEG hotlinked from MoMA's media server.
@@ -36,10 +37,7 @@ npm install
 npm run build
 ```
 
-This downloads the CSV (it takes a minute) and writes
-`public/data/shard-<n>.json` plus `public/data/meta.json`, printing the final
-count of works with images. Re-run it any time to refresh the dataset —
-MoMA updates the source repository regularly.
+This downloads the CSV (it takes a minute) and writes `public/data/shard-<n>.json` plus `public/data/meta.json`, printing the final count of works with images. Re-run it any time to refresh the dataset. MoMA updates the source repository regularly.
 
 ## Run locally
 
