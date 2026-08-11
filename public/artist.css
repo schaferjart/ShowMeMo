@@ -1,0 +1,401 @@
+/* The wall: one artist at a time, hung to fit the screen exactly.
+   Layered on top of style.css, which owns the palette, the controls and the
+   bottom bar the single-work machine already uses. */
+
+:root {
+  --wall-pad: min(3.4vmin, 28px);
+  /* Room at the foot of the wall for the artist's name; artist.js measures the
+     real bar on load and replaces this estimate. */
+  --wall-label: 52px;
+}
+
+.wall-page main {
+  padding: var(--wall-pad);
+  padding-bottom: var(--wall-label);
+}
+
+#wall {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.32s ease;
+}
+
+/* The bottom bar is a band of its own here: the wall runs to a hard edge, so
+   the single-work page's fade-out would wash out the bottom row of works. */
+.wall-page #bottom {
+  padding: 8px 16px 10px;
+  background: var(--bg);
+}
+
+/* Tiles are placed absolutely from the solved geometry; the settle and any
+   rehang animate between two solutions of the same wall. */
+.tile {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: hidden;
+  cursor: zoom-in;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid currentColor;
+  opacity: 0.09;
+  transition: opacity 0.4s ease;
+}
+
+.tile.filled::before {
+  opacity: 0;
+}
+
+.tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The solver leaves every tile off its work's true proportions by the same
+     small factor, so every work loses the same sliver — a passe-partout. */
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.65s ease;
+}
+
+.tile img.shown {
+  opacity: 1;
+}
+
+.tile.leaving {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+#wall.settling .tile {
+  transition: left 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+    top 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+    width 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+    height 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Pointing at a work brings it forward and puts its title in the bottom bar. */
+.tile:hover img,
+.tile:focus-visible img {
+  opacity: 0.82;
+}
+
+.tile:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile img,
+  #wall.settling .tile,
+  .tile.leaving {
+    transition: none;
+  }
+}
+
+/* --- the artist's label ------------------------------------------------ */
+
+/* The wall runs under the controls, so give the icons a halo in the page
+   colour to keep them legible over a dark work. */
+.wall-page .controls svg {
+  filter: drop-shadow(0 0 2px var(--bg)) drop-shadow(0 0 4px var(--bg));
+}
+
+#card {
+  max-width: min(70ch, 100%);
+  font-size: 13px;
+}
+
+#card-summary {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#card-summary:hover,
+#card-summary:focus-visible,
+#card.open #card-summary {
+  opacity: 1;
+}
+
+#card.open #card-summary {
+  white-space: normal;
+  cursor: default;
+}
+
+#card-name {
+  font-weight: 600;
+}
+
+#card-bio {
+  opacity: 0.75;
+}
+
+#card-bio:not(:empty)::before {
+  content: ' · ';
+  font-style: normal;
+  opacity: 0.5;
+}
+
+/* Pointing at a work relabels the bar with that work; the artist stays put. */
+#card-bio.work-title {
+  font-style: italic;
+  opacity: 1;
+}
+
+#card-details {
+  margin-top: 5px;
+}
+
+#card-details p {
+  margin: 0 0 4px;
+}
+
+#card-details p:empty {
+  display: none;
+}
+
+#card-details a {
+  color: inherit;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px !important;
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* The one line that says how this wall was arrived at, and lets you argue
+   with it: which hang, how many works, whether it drifts. */
+#card-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#card-controls .sep {
+  opacity: 0.3;
+}
+
+#hang-name,
+#drift-toggle {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px dotted currentColor;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+#hang-name:hover,
+#drift-toggle:hover,
+#hang-name:focus-visible,
+#drift-toggle:focus-visible {
+  opacity: 1;
+}
+
+.density {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.6;
+}
+
+.density > span {
+  font-variant-numeric: tabular-nums;
+}
+
+.density button,
+#card-close,
+#zoom-close,
+#zoom-download {
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.density button:hover,
+#card-close:hover,
+#zoom-close:hover,
+#zoom-download:hover,
+.density button:focus-visible,
+#card-close:focus-visible,
+#zoom-close:focus-visible,
+#zoom-download:focus-visible {
+  opacity: 1;
+}
+
+/* --- one work, close up ------------------------------------------------ */
+
+#zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  padding: min(5vmin, 44px);
+  background: var(--bg);
+  cursor: zoom-out;
+}
+
+#zoom[hidden] {
+  display: none;
+}
+
+#zoom-img {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+}
+
+#zoom-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  font-size: 13px;
+  cursor: auto;
+}
+
+#zoom-caption {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#zoom-title {
+  font-style: italic;
+}
+
+#zoom-bar a {
+  color: inherit;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+#zoom-bar a:hover,
+#zoom-bar a:focus-visible {
+  opacity: 1;
+}
+
+#zoom-download svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+}
+
+/* --- finding an artist by name ----------------------------------------- */
+
+#search {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  padding: 12vh 16px 16px;
+  background: var(--panel);
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+#search[hidden] {
+  display: none;
+}
+
+#search-box {
+  width: min(46ch, 100%);
+  height: fit-content;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.25);
+}
+
+#search-input {
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+}
+
+#search-input:focus {
+  outline: none;
+}
+
+#search-results {
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+#search-results li {
+  padding: 9px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+#search-results li[aria-selected='true'],
+#search-results li:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+#search-results .count {
+  margin-left: auto;
+  opacity: 0.45;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* A wall that could not be hung at all — no data, no network. */
+.wall-error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.6;
+}

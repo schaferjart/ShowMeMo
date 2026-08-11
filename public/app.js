@@ -4,6 +4,7 @@
   const stage = document.getElementById('stage');
   const refreshBtn = document.getElementById('refresh');
   const downloadBtn = document.getElementById('download');
+  const wallLink = document.getElementById('wall-link');
   const caption = document.getElementById('caption');
   const capSummary = document.getElementById('cap-summary');
   const capDetails = document.getElementById('cap-details');
@@ -119,6 +120,12 @@
     capLink.hidden = !record.URL;
     if (record.URL) capLink.href = record.URL;
 
+    // One work by chance, or the whole hand of whoever made it. Works credited
+    // to several people lead to the first of them.
+    const artistID = record.Cid && record.Cid[0];
+    wallLink.hidden = !artistID;
+    if (artistID) wallLink.href = `artist.html?artist=${artistID}`;
+
     if (window.posthog) {
       posthog.capture('artwork_viewed', {
         object_id: record.ObjectID,
@@ -212,6 +219,16 @@
       });
     }
   });
+  wallLink.addEventListener('click', () => {
+    if (window.posthog) {
+      posthog.capture('artist_wall_opened', {
+        object_id: current?.ObjectID,
+        artist: current?.Artist,
+        constituent_id: current?.Cid?.[0],
+        source: 'button',
+      });
+    }
+  });
 
   addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -224,6 +241,16 @@
       setDetailsOpen(capDetails.hidden);
     } else if (key === 'escape') {
       setDetailsOpen(false);
+    } else if (key === 'a' && !wallLink.hidden) {
+      if (window.posthog) {
+        posthog.capture('artist_wall_opened', {
+          object_id: current?.ObjectID,
+          artist: current?.Artist,
+          constituent_id: current?.Cid?.[0],
+          source: 'keyboard',
+        });
+      }
+      location.href = wallLink.href;
     }
   });
 
