@@ -133,6 +133,10 @@
     const url = new URL(location);
     url.searchParams.set('id', record.ObjectID);
     history.replaceState(null, '', url);
+
+    // One pageview per work: the URL now carries ?id=, so each artwork shows as
+    // its own page in PostHog's Pages report (auto-capture is off in init).
+    if (window.posthog) posthog.capture('$pageview');
   }
 
   function preloadNext() {

@@ -15,6 +15,7 @@
         api_host: 'https://eu.i.posthog.com',
         defaults: '2026-05-30',
         person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+        capture_pageview: false, // fired manually per artwork (app.js) — the SPA swaps works via replaceState
     });
     // One project for the whole fleet; segment by these super properties.
     posthog.register({ site: 'mia', museum: 'Minneapolis Institute of Art' });
