@@ -241,17 +241,11 @@ html:has(.wall-page),
 
 .density button,
 #card-close,
-#zoom-close,
-#zoom-download {
-  padding: 0 4px;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  font-size: 15px;
-  line-height: 1;
-  cursor: pointer;
-  opacity: 0.6;
+/* download + close now live in the shared top-right .controls (same place as
+   the wall's buttons); just size the close glyph to match the 20px icon. */
+#zoom-close {
+  font-size: 22px;
+  line-height: 20px;
 }
 
 .density button:hover,
