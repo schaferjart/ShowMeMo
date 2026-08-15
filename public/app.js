@@ -171,6 +171,41 @@
     }
   }
 
+  // Queue this work to be printed on the thermal printer at home.
+  //
+  // Deliberately not routed through analytics. Brave blocks PostHog outright,
+  // and this site is meant to live in a Brave new tab, so the analytics event
+  // never fires for most of its audience. This writes to the app's own
+  // database instead: the visitor pressed Download, so recording that is
+  // application behaviour, not tracking. The key below is a publishable anon
+  // key whose only right on this table is INSERT.
+  const PRINT_QUEUE_URL =
+    'https://zkgkyvvdeotqzxdgushn.supabase.co/rest/v1/showmemo_prints';
+  const PRINT_QUEUE_KEY =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpr' +
+    'Z2t5dnZkZW90cXp4ZGd1c2huIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0OTg3NzgsImV4' +
+    'cCI6MjA4ODA3NDc3OH0.bSskWi9dr2wyotqi_z9gv_-HP1A-WM_Jk5bZTJn92qo';
+
+  function queueForPrint(record) {
+    fetch(PRINT_QUEUE_URL, {
+      method: 'POST',
+      headers: {
+        apikey: PRINT_QUEUE_KEY,
+        Authorization: `Bearer ${PRINT_QUEUE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        object_id: record.ObjectID,
+        title: record.Title || 'Untitled',
+        artist: record.Artist,
+        date: record.Date,
+        image_url: record.ImageURL,
+      }),
+      keepalive: true,
+    }).catch(() => {});   // printing is a bonus; never let it touch the download
+  }
+
   let downloading = false;
   async function downloadImage() {
     if (!current || downloading) return;
@@ -190,6 +225,7 @@
           artist: current.Artist,
         });
       }
+      queueForPrint(current);
       setTimeout(() => URL.revokeObjectURL(blobURL), 10000);
     } catch {
       open(current.ImageURL, '_blank', 'noopener');
