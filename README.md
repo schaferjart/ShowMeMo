@@ -17,9 +17,9 @@ from [The Museum of Modern Art's collection dataset](https://github.com/Museumof
 ## The wall — `artist.html`
 
 One random *artist* at a time, hung across the whole viewport. Same
-serendipity, one level up: `Space` / `R` draws another artist, `S` rehangs the
-one you have, and `?artist=<ConstituentID>` permalinks to anybody in the
-collection (`https://www.moma.org/artists/3110` → `artist.html?artist=3110`).
+serendipity, one level up: `Space` / `R` draws another artist, and
+`?artist=<ConstituentID>` permalinks to anybody in the collection
+(`https://www.moma.org/artists/3110` → `artist.html?artist=3110`).
 
 - **The hang fills the screen exactly** — rows of works at their true
   proportions, no scrolling, no leftover background. `hang.js` explains the
@@ -35,8 +35,10 @@ collection (`https://www.moma.org/artists/3110` → `artist.html?artist=3110`).
   centimetres, which describe the object rather than the photograph of it. As
   the pictures arrive and report what shape they actually are, the wall hangs
   itself again and the works move into place.
-- **Three hangs** (`H`): salon (by chance), chronological (first work to last,
-  spread across the whole career however few fit), and by shape.
+- **Three hangs**: salon (by chance), chronological (first work to last, spread
+  across the whole career however few fit), and by shape. The wall opens on the
+  salon hang; clicking its name in the details panel moves to the next one and
+  rehangs.
 - **It drifts.** Left alone, one work at a time swaps itself out for another of
   the same proportions, so a wall open on a second screen is never quite the
   same wall. The composition never moves; only the pictures do. Off with the
