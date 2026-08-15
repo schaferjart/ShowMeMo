@@ -807,8 +807,6 @@
   // --- wiring ------------------------------------------------------------
 
   document.getElementById('another').addEventListener('click', () => go(pickArtist, 'button'));
-  document.getElementById('reshuffle').addEventListener('click', () => rehang('button'));
-  document.getElementById('hang-mode').addEventListener('click', () => cycleHang());
   document.getElementById('find').addEventListener('click', openSearch);
   hangName.addEventListener('click', () => cycleHang());
   driftToggle.addEventListener('click', () => {
@@ -895,10 +893,6 @@
     if (key === ' ' || key === 'r') {
       e.preventDefault();
       go(pickArtist, key === ' ' ? 'space' : 'r');
-    } else if (key === 's') {
-      rehang('keyboard');
-    } else if (key === 'h') {
-      cycleHang();
     } else if (key === '/') {
       e.preventDefault();
       openSearch();

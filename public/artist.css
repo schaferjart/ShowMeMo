@@ -9,6 +9,13 @@
   --wall-label: 52px;
 }
 
+/* The wall fills the viewport exactly, so never let a stray scrollbar appear —
+   it would shove the fixed top-right controls sideways as it flickers in and out. */
+html:has(.wall-page),
+.wall-page {
+  overflow: hidden;
+}
+
 .wall-page main {
   padding: var(--wall-pad);
   padding-bottom: var(--wall-label);
