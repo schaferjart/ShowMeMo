@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merci: MoMA — one artist</title>
+<meta name="description" content="A screenful of one random artist from The Museum of Modern Art.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="artist.css">
+<!-- PostHog analytics. The project token is a publishable client key (safe to
+     expose); this is a static site with no bundler, so it lives here inline. -->
+<script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Ji Yi init fn mn Hr pn bn cn capture calculateEventProperties Sn register register_once register_for_session unregister unregister_for_session Tn getFeatureFlag getFeatureFlagPayload getFeatureFlagResult getAllFeatureFlags isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync Mn identify setPersonProperties unsetPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset shutdown setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty Cn xn createPersonProfile setInternalOrTestUser In hn Pn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing debug Ur wt getPageViewId captureTraceFeedback captureTraceMetric an".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_zd5UCuwRojZtqfP9Y3GA48x562SBe5Ws9CyNEcjdaHhA', {
+        api_host: 'https://eu.i.posthog.com',
+        defaults: '2026-05-30',
+        person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+    });
+    // One project for the whole fleet; segment by these super properties.
+    posthog.register({ site: 'moma', museum: 'MoMA', surface: 'wall' });
+</script>
+</head>
+<body class="wall-page">
+<main>
+  <div id="wall" aria-busy="true"></div>
+</main>
+
+<div class="controls">
+  <button id="another" type="button" aria-label="Another artist" title="Another artist (R)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+      <path d="M20 4v5h-5"/>
+    </svg>
+  </button>
+  <button id="find" type="button" aria-label="Find an artist" title="Find an artist (/)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>
+    </svg>
+  </button>
+  <a id="single" href="./" aria-label="One work at a time" title="One work at a time">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/>
+    </svg>
+  </a>
+</div>
+
+<div id="bottom">
+  <aside id="card">
+    <button id="card-summary" type="button" aria-expanded="false" aria-controls="card-details" title="More about this artist (I)">
+      <strong id="card-name"></strong><span id="card-bio"></span>
+    </button>
+    <div id="card-details" hidden>
+      <p id="card-holdings"></p>
+      <p id="card-controls">
+        <button id="hang-name" type="button" title="Change the hang (H)"></button>
+        <span class="sep">&middot;</span>
+        <span class="density">
+          <button type="button" data-step="-1" aria-label="Fewer, larger works">&minus;</button>
+          <span id="density-label">works</span>
+          <button type="button" data-step="1" aria-label="More, smaller works">+</button>
+        </span>
+        <span class="sep">&middot;</span>
+        <button id="drift-toggle" type="button" aria-pressed="false"></button>
+      </p>
+      <p class="card-row">
+        <a id="card-link" href="" target="_blank" rel="noopener">View at MoMA</a>
+        <span class="spacer"></span>
+        <button id="card-close" type="button" aria-label="Close details">&times;</button>
+      </p>
+    </div>
+  </aside>
+  <footer>Inspired by the work of JB, JS 2026.</footer>
+</div>
+
+<div id="search" hidden>
+  <div id="search-box">
+    <input id="search-input" type="search" autocomplete="off" spellcheck="false"
+           placeholder="Find an artist" aria-label="Find an artist"
+           role="combobox" aria-expanded="false" aria-controls="search-results" aria-autocomplete="list">
+    <ul id="search-results" role="listbox" aria-label="Artists"></ul>
+  </div>
+</div>
+
+<div id="zoom" hidden role="dialog" aria-modal="true" aria-label="Work">
+  <div class="controls">
+    <button id="zoom-download" type="button" aria-label="Download image" title="Download image">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>
+      </svg>
+    </button>
+    <button id="zoom-close" type="button" aria-label="Close">&times;</button>
+  </div>
+  <img id="zoom-img" alt="">
+  <div id="zoom-bar">
+    <p id="zoom-caption"><em id="zoom-title"></em><span id="zoom-date"></span></p>
+    <span class="spacer"></span>
+    <a id="zoom-link" href="" target="_blank" rel="noopener">View at MoMA</a>
+  </div>
+</div>
+
+<noscript><p class="noscript">This page needs JavaScript to hang a wall of artworks.</p></noscript>
+
+<script src="hang.js"></script>
+<script src="artist.js"></script>
+</body>
+</html>

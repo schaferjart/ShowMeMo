@@ -87,7 +87,9 @@ main {
   display: flex;
 }
 
-.controls button {
+.controls button,
+.controls a {
+  display: block;
   background: none;
   border: 0;
   padding: 10px;
@@ -97,8 +99,14 @@ main {
 }
 
 .controls button:hover,
-.controls button:focus-visible {
+.controls a:hover,
+.controls button:focus-visible,
+.controls a:focus-visible {
   opacity: 1;
+}
+
+.controls [hidden] {
+  display: none;
 }
 
 .controls svg {
