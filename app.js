@@ -175,32 +175,36 @@
   //
   // Deliberately not routed through analytics. Brave blocks PostHog outright,
   // and this site is meant to live in a Brave new tab, so the analytics event
-  // never fires for most of its audience. This writes to the app's own
-  // database instead: the visitor pressed Download, so recording that is
-  // application behaviour, not tracking. The key below is a publishable anon
-  // key whose only right on this table is INSERT.
-  const PRINT_QUEUE_URL =
-    'https://zkgkyvvdeotqzxdgushn.supabase.co/rest/v1/showmemo_prints';
-  const PRINT_QUEUE_KEY =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpr' +
-    'Z2t5dnZkZW90cXp4ZGd1c2huIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0OTg3NzgsImV4' +
-    'cCI6MjA4ODA3NDc3OH0.bSskWi9dr2wyotqi_z9gv_-HP1A-WM_Jk5bZTJn92qo';
+  // never fires for most of its audience. This calls the printer's send_print
+  // function instead: the visitor pressed Download, so printing it is
+  // application behaviour, not tracking. Every printer subscribed to
+  // "showmemo" gets the card; a work downloaded again prints as more strips.
+  //
+  // The key is a publishable key, made to ship in client code: it can only
+  // call the printer.* functions (no table access), and the database caps how
+  // many prints per hour it accepts. sb_ keys are not JWTs, so it goes in the
+  // apikey header only, with no Authorization header.
+  const PRINT_URL = 'https://ciotlnezfmdcgirfyjsh.supabase.co/rest/v1/rpc/send_print';
+  const PRINT_KEY = 'sb_publishable_ZdhtMeVhUMZbsKaIP1Gbhg_3AAVHo1I';
 
   function queueForPrint(record) {
-    fetch(PRINT_QUEUE_URL, {
+    fetch(PRINT_URL, {
       method: 'POST',
       headers: {
-        apikey: PRINT_QUEUE_KEY,
-        Authorization: `Bearer ${PRINT_QUEUE_KEY}`,
+        apikey: PRINT_KEY,
+        'Content-Profile': 'printer',
         'Content-Type': 'application/json',
-        Prefer: 'return=minimal',
       },
       body: JSON.stringify({
-        object_id: record.ObjectID,
-        title: record.Title || 'Untitled',
-        artist: record.Artist,
-        date: record.Date,
-        image_url: record.ImageURL,
+        source: 'showmemo',
+        template: 'showmemo',
+        payload: {
+          object_id: record.ObjectID,
+          title: record.Title || 'Untitled',
+          artist: record.Artist,
+          date: record.Date,
+          image_url: record.ImageURL,
+        },
       }),
       keepalive: true,
     }).catch(() => {});   // printing is a bonus; never let it touch the download
